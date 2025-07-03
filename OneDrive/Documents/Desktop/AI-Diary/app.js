@@ -27,7 +27,7 @@ app.get("/",(req,res)=>{
 })
 app.get("/AI-diary/login",(req,res)=>{
    res.render("diary/login.ejs")
-})
+}) 
 app.get("/AI-diary/register",(req,res)=>{
    res.render("diary/register.ejs")
 })
