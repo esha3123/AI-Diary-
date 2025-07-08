@@ -43,7 +43,53 @@ body {
 
 .dashboard-container {
     min-height: 100vh;
-    padding-top: 2rem;
+    padding-top: 1rem;
+}
+
+/* Custom Grid Layout (Replacing Bootstrap) */
+.welcome-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.welcome-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: center;
+}
+
+.main-content-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+/* Responsive Grid */
+@media (max-width: 992px) {
+    .welcome-grid,
+    .content-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .new-entry-area {
+        order: -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .welcome-container,
+    .main-content-container {
+        padding: 0 0.5rem;
+    }
 }
 
 /* Welcome Section */
@@ -579,24 +625,5 @@ input:checked + .toggle-slider:before {
     .entry-actions {
         align-self: stretch;
         justify-content: center;
-    }
-}
-
-@media (max-width: 576px) {
-    .dashboard-container {
-        padding-top: 1rem;
-    }
-    
-    .welcome-section {
-        padding: 2rem 0;
-    }
-    
-    .section-card {
-        padding: 1rem;
-    }
-    
-    .quick-stats {
-        flex-direction: column;
-        gap: 0.5rem;
     }
 }

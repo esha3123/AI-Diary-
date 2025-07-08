@@ -28,10 +28,19 @@ app.get("/",(req,res)=>{
 app.get("/AI-diary/login",(req,res)=>{
    res.render("diary/login.ejs")
 }) 
+app.get("/login",(req,res)=>{
+   res.render("diary/login.ejs")
+}) 
 app.get("/AI-diary/register",(req,res)=>{
    res.render("diary/register.ejs")
 })
+app.get("/register",(req,res)=>{
+   res.render("diary/register.ejs")
+})
 app.get("/AI-diary",(req,res)=>{
+   res.render("diary/home.ejs")
+})
+app.get("/AI-diary/home",(req,res)=>{
    res.render("diary/home.ejs")
 })
 app.get("/AI-diary/new",(req,res)=>{
@@ -51,7 +60,10 @@ app.get("/AI-diary/entry-details",(req,res)=>{
 })
 
 
-
+app.use((req,res,next)=>{
+res.status(404).render("diary/404.ejs")
+    next()
+})
 
 app.listen(5000,()=>{
     console.log("listening on port 5000");
