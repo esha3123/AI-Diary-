@@ -292,14 +292,13 @@ body {
     border-color: var(--accent-red);
 }
 
-/* Summary Section */
-.summary-section {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    backdrop-filter: blur(10px);
+/* AI Cheer-up Box */
+.ai-cheerup {
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    border-color: var(--accent-blue);
 }
 
-.summary-badge {
+.ai-badge {
     background: var(--accent-blue);
     color: white;
     padding: 0.25rem 0.75rem;
@@ -308,90 +307,43 @@ body {
     font-weight: 500;
 }
 
-.summary-content {
+.cheerup-content {
     text-align: center;
 }
 
-.summary-options {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    justify-content: center;
+.ai-message {
+    background: white;
+    border-radius: var(--border-radius-sm);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--accent-blue);
 }
 
-.summary-btn {
+.ai-message p {
+    margin: 0;
+    font-style: italic;
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+.refresh-insight-btn {
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--border-radius-sm);
-    padding: 0.75rem 1rem;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: var(--transition);
-    font-size: 0.9rem;
+    margin: 0 auto;
 }
 
-.summary-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-primary);
-}
-
-.summary-btn.active {
-    background: var(--accent-blue);
-    color: white;
-    border-color: var(--accent-blue);
-}
-
-.summary-placeholder {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--border-radius-sm);
-    padding: 2rem;
-    text-align: center;
-    backdrop-filter: blur(10px);
-}
-
-.summary-placeholder i {
-    font-size: 2rem;
-    color: var(--accent-blue);
-    margin-bottom: 1rem;
-}
-
-.summary-placeholder p {
-    margin: 0.5rem 0;
-    color: var(--text-primary);
-    font-weight: 500;
-}
-
-.summary-placeholder small {
-    color: var(--text-muted);
-    font-size: 0.8rem;
-}
-
-/* Empty State for Entries */
-.empty-state {
-    text-align: center;
-    padding: 3rem 2rem;
-    color: var(--text-muted);
-}
-
-.empty-state i {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    color: var(--accent-blue);
-    opacity: 0.5;
-}
-
-.empty-state h4 {
-    margin-bottom: 0.5rem;
-    color: var(--text-secondary);
-}
-
-.empty-state p {
-    margin: 0;
-    font-size: 0.9rem;
+.refresh-insight-btn:hover {
+    background: var(--accent-purple);
+    transform: translateY(-2px);
 }
 
 /* Mood Analytics */
@@ -440,9 +392,8 @@ body {
 
 /* Time Capsule */
 .time-capsule {
-    background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(249, 115, 22, 0.05));
-    border: 1px solid rgba(249, 115, 22, 0.3);
-    backdrop-filter: blur(10px);
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-color: var(--accent-orange);
 }
 
 .capsule-content {
@@ -450,13 +401,11 @@ body {
 }
 
 .capsule-message {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: white;
     border-radius: var(--border-radius-sm);
     padding: 1.5rem;
     margin-bottom: 1rem;
     border-left: 4px solid var(--accent-orange);
-    backdrop-filter: blur(10px);
 }
 
 .capsule-message i {
@@ -650,37 +599,4 @@ input:checked + .toggle-slider:before {
         flex-direction: column;
         gap: 0.5rem;
     }
-}
-
-/* Light Mode Specific Overrides */
-body.light-mode .summary-section {
-    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-}
-
-body.light-mode .summary-placeholder {
-    background: white;
-    border: 1px solid rgba(59, 130, 246, 0.1);
-    color: var(--text-primary);
-}
-
-body.light-mode .summary-btn {
-    background: white;
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    color: var(--text-primary);
-}
-
-body.light-mode .time-capsule {
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    border: 1px solid rgba(249, 115, 22, 0.2);
-}
-
-body.light-mode .capsule-message {
-    background: white;
-    border: 1px solid rgba(249, 115, 22, 0.1);
-    color: var(--text-primary);
-}
-
-body.light-mode .welcome-section {
-    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
 }

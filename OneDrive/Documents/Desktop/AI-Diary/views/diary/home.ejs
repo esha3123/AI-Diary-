@@ -11,22 +11,22 @@
                 <div class="col-lg-8">
                     <div class="welcome-content">
                         <h1 class="welcome-title">
-                            Welcome back, <span class="user-name">[Username]</span> 
+                            Welcome back, <span class="user-name">Nitin/Esha</span> 
                             <span class="wave-emoji">👋</span>
                         </h1>
                         <p class="welcome-subtitle">Ready to capture today's thoughts and feelings?</p>
                         <div class="quick-stats">
                             <div class="stat-item">
                                 <i class="fas fa-book"></i>
-                                <span>[X] Entries</span>
+                                <span>12 Entries</span>
                             </div>
                             <div class="stat-item">
                                 <i class="fas fa-fire"></i>
-                                <span>[X] Day Streak</span>
+                                <span>5 Day Streak</span>
                             </div>
                             <div class="stat-item">
                                 <i class="fas fa-heart"></i>
-                                <span>[Current Mood]</span>
+                                <span>Happy Mood</span>
                             </div>
                         </div>
                     </div>
@@ -57,17 +57,17 @@
                     </div>
                     
                     <div class="entries-list">
-                        <!-- Entry items will be populated from database -->
+                        <!-- Entry Item 1 -->
                         <div class="entry-item">
                             <div class="entry-content">
                                 <div class="entry-header">
-                                    <h4 class="entry-title">[Entry Title]</h4>
-                                    <span class="entry-mood">[Mood Emoji]</span>
+                                    <h4 class="entry-title">A Beautiful Day in the Park</h4>
+                                    <span class="entry-mood">😊</span>
                                 </div>
-                                <p class="entry-preview">[Entry preview text...]</p>
+                                <p class="entry-preview">Today I went for a walk in the central park and felt so peaceful...</p>
                                 <div class="entry-meta">
                                     <span class="entry-date">
-                                        <i class="fas fa-calendar"></i> [Entry Date]
+                                        <i class="fas fa-calendar"></i> July 3, 2025
                                     </span>
                                     <div class="entry-actions">
                                         <button class="action-btn view-btn" title="View">
@@ -87,39 +87,81 @@
                             </div>
                         </div>
 
-                        <!-- More entries will be dynamically loaded here -->
-                        <div class="no-entries" style="display: none;">
-                            <div class="empty-state">
-                                <i class="fas fa-book-open"></i>
-                                <h4>No entries yet</h4>
-                                <p>Start your journaling journey by creating your first entry!</p>
+                        <!-- Entry Item 2 -->
+                        <div class="entry-item">
+                            <div class="entry-content">
+                                <div class="entry-header">
+                                    <h4 class="entry-title">Challenging Day at Work</h4>
+                                    <span class="entry-mood">😔</span>
+                                </div>
+                                <p class="entry-preview">Work was quite overwhelming today, but I managed to push through...</p>
+                                <div class="entry-meta">
+                                    <span class="entry-date">
+                                        <i class="fas fa-calendar"></i> July 2, 2025
+                                    </span>
+                                    <div class="entry-actions">
+                                        <button class="action-btn view-btn" title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn listen-btn" title="Listen">
+                                            <i class="fas fa-volume-up"></i>
+                                        </button>
+                                        <button class="action-btn edit-btn" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete-btn" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Entry Item 3 -->
+                        <div class="entry-item">
+                            <div class="entry-content">
+                                <div class="entry-header">
+                                    <h4 class="entry-title">Weekend Adventures</h4>
+                                    <span class="entry-mood">🎉</span>
+                                </div>
+                                <p class="entry-preview">Had an amazing weekend with friends, lots of laughter and good memories...</p>
+                                <div class="entry-meta">
+                                    <span class="entry-date">
+                                        <i class="fas fa-calendar"></i> June 30, 2025
+                                    </span>
+                                    <div class="entry-actions">
+                                        <button class="action-btn view-btn" title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn listen-btn" title="Listen">
+                                            <i class="fas fa-volume-up"></i>
+                                        </button>
+                                        <button class="action-btn edit-btn" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete-btn" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Weekly/Monthly Summary -->
-                <div class="section-card summary-section">
+                <!-- AI Cheer-up Box -->
+                <div class="section-card ai-cheerup">
                     <div class="section-header">
-                        <h3><i class="fas fa-chart-line"></i> Summary Reports</h3>
-                        <span class="summary-badge">AI Powered</span>
+                        <h3><i class="fas fa-robot"></i> AI Insight</h3>
+                        <span class="ai-badge">Powered by AI</span>
                     </div>
-                    <div class="summary-content">
-                        <div class="summary-options">
-                            <button class="summary-btn weekly-btn active">
-                                <i class="fas fa-calendar-week"></i>
-                                <span>Weekly Summary</span>
-                            </button>
-                            <button class="summary-btn monthly-btn">
-                                <i class="fas fa-calendar-alt"></i>
-                                <span>Monthly Summary</span>
-                            </button>
+                    <div class="cheerup-content">
+                        <div class="ai-message">
+                            <p>"You've been showing great resilience this week! Even through challenging moments, you've maintained a positive outlook. Keep nurturing that inner strength! 💙"</p>
                         </div>
-                        <div class="summary-placeholder">
-                            <i class="fas fa-microphone"></i>
-                            <p>AI voice summaries will be available here</p>
-                            <small>Coming soon - Weekly and monthly diary insights</small>
-                        </div>
+                        <button class="refresh-insight-btn">
+                            <i class="fas fa-refresh"></i> Get New Insight
+                        </button>
                     </div>
                 </div>
             </div>
@@ -136,17 +178,17 @@
                         <div class="mood-stats">
                             <div class="mood-stat">
                                 <span class="mood-emoji">😊</span>
-                                <span class="mood-count">[X]</span>
+                                <span class="mood-count">3</span>
                                 <span class="mood-label">Happy</span>
                             </div>
                             <div class="mood-stat">
                                 <span class="mood-emoji">😐</span>
-                                <span class="mood-count">[X]</span>
+                                <span class="mood-count">2</span>
                                 <span class="mood-label">Neutral</span>
                             </div>
                             <div class="mood-stat">
                                 <span class="mood-emoji">😔</span>
-                                <span class="mood-count">[X]</span>
+                                <span class="mood-count">1</span>
                                 <span class="mood-label">Sad</span>
                             </div>
                         </div>
@@ -167,10 +209,10 @@
                     <div class="capsule-content">
                         <div class="capsule-message">
                             <i class="fas fa-envelope"></i>
-                            <p><strong>Time Capsule:</strong></p>
-                            <p>[Your future/past messages will appear here]</p>
+                            <p><strong>Reminder from 2 weeks ago:</strong></p>
+                            <p>"Don't give up on your dreams! You're stronger than you think! 🌟"</p>
                         </div>
-                        <span class="capsule-date">No messages yet</span>
+                        <span class="capsule-date">Posted: June 20, 2025</span>
                     </div>
                 </div>
 
@@ -206,7 +248,7 @@
                 <!-- Theme Toggle -->
                 <div class="theme-toggle-card">
                     <div class="theme-toggle">
-                        <span class="theme-label">Light Mode</span>
+                        <span class="theme-label">Dark Mode</span>
                         <label class="toggle-switch">
                             <input type="checkbox" id="themeToggle">
                             <span class="toggle-slider"></span>
