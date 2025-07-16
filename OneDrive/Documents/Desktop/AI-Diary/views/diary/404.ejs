@@ -1,55 +1,398 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Page Not Found | AI Diary</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="CSS/404.css">
-   
-</head>
-<body>
-    <div class="error-container">
-        <div class="diary-icon">
-            <i class="fa-solid fa-book-open-reader"></i>
-        </div>
-        
-        <div class="error-number">404</div>
-        
-        <h1 class="error-title">Page Not Found</h1>
-        
-        <p class="error-subtitle">
-            Oops! It seems like this page has disappeared into the digital void. 
-            <br>Don't worry, let's get you back to documenting your thoughts and memories.
-        </p>
-        
-        <div class="action-buttons">
-            <a href="/" class="btn-primary-custom">
-                <i class="fas fa-home me-2"></i>Back to Home
-            </a>
-            <a href="/login" class="btn-secondary-custom">
-                <i class="fas fa-sign-in-alt me-2"></i>Login
-            </a>
-        </div>
-        
-        <div class="suggestions">
-            <h3><i class="fas fa-lightbulb me-2"></i>Quick Navigation</h3>
-            <ul class="suggestion-list">
-                <li><a href="/"><i class="fas fa-home me-2"></i>Homepage</a></li>
-                <li><a href="/login"><i class="fas fa-sign-in-alt me-2"></i>Login to Your Diary</a></li>
-                <li><a href="/register"><i class="fas fa-user-plus me-2"></i>Create New Account</a></li>
-                <li><a href="/diary/new"><i class="fas fa-plus me-2"></i>Write New Entry</a></li>
-                <li><a href="/diary/analytics"><i class="fas fa-chart-line me-2"></i>View Analytics</a></li>
-            </ul>
-        </div>
-        
-        <a href="/" class="brand-link">
-            <i class="fa-solid fa-book-open-reader"></i>
-            <span>AI Diary</span>
-        </a>
-    </div>
+<% layout("/layouts/boilerplate") %>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
-</body>
-</html>
+<link rel="stylesheet" href="/CSS/404.css">
+
+<main class="error-page">
+    <div class="error-container">
+        <!-- Header Section -->
+        <header class="error-header">
+            <div class="diary-icon">
+                <i class="fas fa-book-open"></i>
+            </div>
+            
+            <div class="error-number">404</div>
+            
+            <h1 class="error-title">Page Not Found</h1>
+            
+            <p class="error-subtitle">
+                Oops! The page you're looking for seems to have been lost in the digital diary. 
+                Let's get you back to writing your thoughts and memories.
+            </p>
+        </header>
+
+        <!-- Interactive Game Section -->
+        <section class="game-section" aria-label="Flying Pen Game">
+            <h2><i class="fas fa-gamepad"></i> Play while you wait - Flying Pen Game!</h2>
+            <p class="game-instructions">Press SPACE or click to make the pen fly and collect diary pages!</p>
+            
+            <div class="game-container">
+                <canvas id="gameCanvas" width="600" height="200" aria-label="Flying Pen Game Canvas"></canvas>
+                <div class="game-overlay" id="gameOverlay">
+                    <div class="game-start">
+                        <h3>Flying Pen Adventure</h3>
+                        <p>Help the pen collect diary pages!</p>
+                        <button class="game-btn" onclick="startGame()">
+                            <i class="fas fa-play"></i> Start Game
+                        </button>
+                    </div>
+                    <div class="game-over" id="gameOver" style="display: none;">
+                        <h3>Game Over!</h3>
+                        <p>Score: <span id="finalScore">0</span></p>
+                        <button class="game-btn" onclick="restartGame()">
+                            <i class="fas fa-redo"></i> Play Again
+                        </button>
+                    </div>
+                </div>
+                <div class="game-score">
+                    <span>Score: <span id="score">0</span></span>
+                    <span>High Score: <span id="highScore">0</span></span>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Action Buttons Section -->
+        <section class="action-buttons" aria-label="Quick Actions">
+            <a href="/AI-diary/home" class="btn-primary-custom">
+                <i class="fas fa-home"></i>
+                Back to Home
+            </a>
+            <a href="/AI-diary/new" class="btn-secondary-custom">
+                <i class="fas fa-plus"></i>
+                Write New Entry
+            </a>
+        </section>
+        
+        <!-- Suggestions Section -->
+        <section class="suggestions" aria-label="Helpful Links">
+            <h2><i class="fas fa-lightbulb"></i> What you might be looking for:</h2>
+            <nav>
+                <ul class="suggestion-list">
+                    <li>
+                        <a href="/AI-diary/home">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard - View your recent entries and mood analytics</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/AI-diary/new">
+                            <i class="fas fa-plus"></i>
+                            <span>New Entry - Start writing your thoughts for today</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/AI-diary/analytics">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Analytics - Track your mood patterns and writing habits</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/AI-diary/public">
+                            <i class="fas fa-globe"></i>
+                            <span>Public Wall - Explore community thoughts and inspiration</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/AI-diary/profile">
+                            <i class="fas fa-user"></i>
+                            <span>Profile - Manage your account settings and preferences</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </section>
+        
+        <!-- Footer Link -->
+        <footer class="error-footer">
+            <a href="/" class="brand-link">
+                <i class="fas fa-book-open-reader"></i>
+                <span>Return to AI Diary</span>
+            </a>
+        </footer>
+    </div>
+</main>
+
+<!-- JavaScript for Flying Pen Game -->
+<script>
+    // Flying Pen Game - Similar to Chrome Dinosaur Game
+    class FlyingPenGame {
+        constructor() {
+            this.canvas = document.getElementById('gameCanvas');
+            if (!this.canvas) return;
+            
+            this.ctx = this.canvas.getContext('2d');
+            this.gameRunning = false;
+            this.score = 0;
+            this.highScore = parseInt(localStorage.getItem('flyingPenHighScore')) || 0;
+            
+            // Game objects
+            this.pen = {
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 8,
+                velocityY: 0,
+                gravity: 0.5,
+                jumpPower: -8
+            };
+            
+            this.obstacles = [];
+            this.collectibles = [];
+            this.frameCount = 0;
+            
+            // Update high score display
+            const highScoreEl = document.getElementById('highScore');
+            if (highScoreEl) {
+                highScoreEl.textContent = this.highScore;
+            }
+            
+            this.setupControls();
+            this.gameLoop();
+        }
+        
+        setupControls() {
+            // Space key controls
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Space' && this.gameRunning) {
+                    e.preventDefault();
+                    this.jump();
+                }
+            });
+            
+            // Click controls
+            if (this.canvas) {
+                this.canvas.addEventListener('click', () => {
+                    if (this.gameRunning) {
+                        this.jump();
+                    }
+                });
+            }
+        }
+        
+        jump() {
+            this.pen.velocityY = this.pen.jumpPower;
+        }
+        
+        start() {
+            this.gameRunning = true;
+            this.score = 0;
+            this.pen.y = 100;
+            this.pen.velocityY = 0;
+            this.obstacles = [];
+            this.collectibles = [];
+            this.frameCount = 0;
+            
+            const overlay = document.getElementById('gameOverlay');
+            const gameOver = document.getElementById('gameOver');
+            
+            if (overlay) overlay.style.display = 'none';
+            if (gameOver) gameOver.style.display = 'none';
+        }
+        
+        update() {
+            if (!this.gameRunning) return;
+            
+            this.frameCount++;
+            
+            // Update pen physics
+            this.pen.velocityY += this.pen.gravity;
+            this.pen.y += this.pen.velocityY;
+            
+            // Keep pen in bounds
+            if (this.pen.y < 0) this.pen.y = 0;
+            if (this.pen.y > this.canvas.height - this.pen.height) {
+                this.gameOver();
+                return;
+            }
+            
+            // Spawn obstacles
+            if (this.frameCount % 120 === 0) {
+                this.obstacles.push({
+                    x: this.canvas.width,
+                    y: Math.random() * (this.canvas.height - 80) + 40,
+                    width: 15,
+                    height: 60,
+                    speed: 2
+                });
+            }
+            
+            // Spawn collectibles (diary pages)
+            if (this.frameCount % 180 === 0) {
+                this.collectibles.push({
+                    x: this.canvas.width,
+                    y: Math.random() * (this.canvas.height - 40) + 20,
+                    width: 20,
+                    height: 20,
+                    speed: 2
+                });
+            }
+            
+            // Update obstacles
+            this.obstacles = this.obstacles.filter(obstacle => {
+                obstacle.x -= obstacle.speed;
+                return obstacle.x > -obstacle.width;
+            });
+            
+            // Update collectibles
+            this.collectibles = this.collectibles.filter(collectible => {
+                collectible.x -= collectible.speed;
+                return collectible.x > -collectible.width;
+            });
+            
+            // Check collisions
+            this.checkCollisions();
+            
+            // Increase score
+            this.score = Math.floor(this.frameCount / 10);
+            const scoreEl = document.getElementById('score');
+            if (scoreEl) {
+                scoreEl.textContent = this.score;
+            }
+        }
+        
+        checkCollisions() {
+            // Check obstacle collisions
+            for (let obstacle of this.obstacles) {
+                if (this.pen.x < obstacle.x + obstacle.width &&
+                    this.pen.x + this.pen.width > obstacle.x &&
+                    this.pen.y < obstacle.y + obstacle.height &&
+                    this.pen.y + this.pen.height > obstacle.y) {
+                    this.gameOver();
+                    return;
+                }
+            }
+            
+            // Check collectible collisions
+            this.collectibles = this.collectibles.filter(collectible => {
+                if (this.pen.x < collectible.x + collectible.width &&
+                    this.pen.x + this.pen.width > collectible.x &&
+                    this.pen.y < collectible.y + collectible.height &&
+                    this.pen.y + this.pen.height > collectible.y) {
+                    this.score += 10;
+                    return false; // Remove collectible
+                }
+                return true;
+            });
+        }
+        
+        gameOver() {
+            this.gameRunning = false;
+            
+            // Update high score
+            if (this.score > this.highScore) {
+                this.highScore = this.score;
+                localStorage.setItem('flyingPenHighScore', this.highScore);
+                const highScoreEl = document.getElementById('highScore');
+                if (highScoreEl) {
+                    highScoreEl.textContent = this.highScore;
+                }
+            }
+            
+            const finalScoreEl = document.getElementById('finalScore');
+            const gameOverEl = document.getElementById('gameOver');
+            const overlayEl = document.getElementById('gameOverlay');
+            
+            if (finalScoreEl) finalScoreEl.textContent = this.score;
+            if (gameOverEl) gameOverEl.style.display = 'block';
+            if (overlayEl) overlayEl.style.display = 'flex';
+        }
+        
+        draw() {
+            if (!this.ctx) return;
+            
+            // Clear canvas
+            this.ctx.fillStyle = '#f8f9fa';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            
+            if (!this.gameRunning) return;
+            
+            // Draw pen (as a simple pen shape)
+            this.ctx.fillStyle = '#667eea';
+            this.ctx.fillRect(this.pen.x, this.pen.y, this.pen.width, this.pen.height);
+            
+            // Draw pen tip
+            this.ctx.fillStyle = '#764ba2';
+            this.ctx.fillRect(this.pen.x + this.pen.width, this.pen.y + 2, 8, 4);
+            
+            // Draw obstacles (as books)
+            this.ctx.fillStyle = '#dc3545';
+            this.obstacles.forEach(obstacle => {
+                this.ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                
+                // Add book details
+                this.ctx.fillStyle = '#ff6b6b';
+                this.ctx.fillRect(obstacle.x + 2, obstacle.y + 2, obstacle.width - 4, 6);
+                this.ctx.fillRect(obstacle.x + 2, obstacle.y + 12, obstacle.width - 4, 2);
+                this.ctx.fillRect(obstacle.x + 2, obstacle.y + 18, obstacle.width - 4, 2);
+                this.ctx.fillStyle = '#dc3545';
+            });
+            
+            // Draw collectibles (diary pages)
+            this.ctx.fillStyle = '#28a745';
+            this.collectibles.forEach(collectible => {
+                this.ctx.fillRect(collectible.x, collectible.y, collectible.width, collectible.height);
+                
+                // Add page lines
+                this.ctx.fillStyle = '#20c997';
+                for (let i = 0; i < 3; i++) {
+                    this.ctx.fillRect(collectible.x + 2, collectible.y + 4 + i * 4, collectible.width - 4, 1);
+                }
+                this.ctx.fillStyle = '#28a745';
+            });
+            
+            // Draw ground line
+            this.ctx.fillStyle = '#6c757d';
+            this.ctx.fillRect(0, this.canvas.height - 2, this.canvas.width, 2);
+        }
+        
+        gameLoop() {
+            this.update();
+            this.draw();
+            requestAnimationFrame(() => this.gameLoop());
+        }
+    }
+
+    // Initialize game
+    let game;
+
+    function startGame() {
+        if (!game) {
+            game = new FlyingPenGame();
+        }
+        game.start();
+    }
+
+    function restartGame() {
+        if (game) {
+            game.start();
+        }
+    }
+
+    // Initialize game object when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize game
+        game = new FlyingPenGame();
+        
+        // Add touch events for mobile
+        const canvas = document.getElementById('gameCanvas');
+        if (canvas) {
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (game && game.gameRunning) {
+                    game.jump();
+                } else {
+                    startGame();
+                }
+            });
+        }
+        
+        // Add click handler for start overlay
+        const gameOverlay = document.getElementById('gameOverlay');
+        if (gameOverlay) {
+            gameOverlay.addEventListener('click', (e) => {
+                if (e.target === gameOverlay) {
+                    startGame();
+                }
+            });
+        }
+    });
+</script>
