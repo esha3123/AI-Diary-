@@ -56,98 +56,40 @@
                         <a href="/AI-diary/entries" class="view-all-link">View All</a>
                     </div>
                     
-                    <div class="entries-list">
-                        <!-- Entry Item 1 -->
-                        <div class="entry-item">
-                            <div class="entry-content">
-                                <div class="entry-header">
-                                    <h4 class="entry-title">A Beautiful Day in the Park</h4>
-                                    <span class="entry-mood">😊</span>
-                                </div>
-                                <p class="entry-preview">Today I went for a walk in the central park and felt so peaceful...</p>
-                                <div class="entry-meta">
-                                    <span class="entry-date">
-                                        <i class="fas fa-calendar"></i> July 3, 2025
-                                    </span>
-                                    <div class="entry-actions">
-                                        <button class="action-btn view-btn" title="View">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="action-btn listen-btn" title="Listen">
-                                            <i class="fas fa-volume-up"></i>
-                                        </button>
-                                        <button class="action-btn edit-btn" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="action-btn delete-btn" title="Delete">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Entry Item 2 -->
-                        <div class="entry-item">
-                            <div class="entry-content">
-                                <div class="entry-header">
-                                    <h4 class="entry-title">Challenging Day at Work</h4>
-                                    <span class="entry-mood">😔</span>
-                                </div>
-                                <p class="entry-preview">Work was quite overwhelming today, but I managed to push through...</p>
-                                <div class="entry-meta">
-                                    <span class="entry-date">
-                                        <i class="fas fa-calendar"></i> July 2, 2025
-                                    </span>
-                                    <div class="entry-actions">
-                                        <button class="action-btn view-btn" title="View">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="action-btn listen-btn" title="Listen">
-                                            <i class="fas fa-volume-up"></i>
-                                        </button>
-                                        <button class="action-btn edit-btn" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="action-btn delete-btn" title="Delete">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Entry Item 3 -->
-                        <div class="entry-item">
-                            <div class="entry-content">
-                                <div class="entry-header">
-                                    <h4 class="entry-title">Weekend Adventures</h4>
-                                    <span class="entry-mood">🎉</span>
-                                </div>
-                                <p class="entry-preview">Had an amazing weekend with friends, lots of laughter and good memories...</p>
-                                <div class="entry-meta">
-                                    <span class="entry-date">
-                                        <i class="fas fa-calendar"></i> June 30, 2025
-                                    </span>
-                                    <div class="entry-actions">
-                                        <button class="action-btn view-btn" title="View">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="action-btn listen-btn" title="Listen">
-                                            <i class="fas fa-volume-up"></i>
-                                        </button>
-                                        <button class="action-btn edit-btn" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="action-btn delete-btn" title="Delete">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                   <!-- Entry Item Loop -->
+<div class="entries-list">
+    <% for(let entry of entries){ %>
+        <div class="entry-item">
+            <div class="entry-content">
+                <div class="entry-header">
+                    <h4 class="entry-title"><%= entry.title %></h4>
+                    <span class="entry-mood"><%= entry.mood %></span>
+                </div>
+                <p class="entry-preview"><%= entry.content %></p>
+                <div class="entry-meta">
+                    <span class="entry-date">
+                        <i class="fas fa-calendar"></i><%= entry.createdAt.toString().split(" ").slice(0,4).join("-") %>
+                    </span>
+                    <div class="entry-actions">
+                        <button class="action-btn view-btn" title="View">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn listen-btn" title="Listen">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <button class="action-btn edit-btn" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
                 </div>
+            </div>
+        </div>
+    <% } %>
+</div>
+                     
 
                 <!-- AI Cheer-up Box -->
                 <div class="section-card ai-cheerup">
