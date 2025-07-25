@@ -10,11 +10,11 @@ const diarySchema= new schema({
         type: String,
         required: true
     },
-    mood: {
-        type: String,
-        required: true,
-        enum: ['happy', 'grateful', 'excited', 'neutral', 'sad', 'anxious']
-    },
+   mood: {
+    type: String,
+    required: true,
+    enum: ['😂', '😀', '🤗', '😤', '😔', '😰']
+},
     isPrivate: {
         type: Boolean,
         default: true
