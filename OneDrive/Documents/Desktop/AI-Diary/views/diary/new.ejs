@@ -88,16 +88,20 @@
             </div>
 
             <div class="form-section privacy-section">
-                <div class="privacy-toggle">
-                    <input type="checkbox" 
-                           id="privacy" 
-                           name="entry[isPrivate]" 
-                           value="true" 
-                           checked>
-                    <label for="privacy" class="privacy-label">
-                        <i class="fas fa-lock"></i>
-                        Keep this entry private
-                    </label>
+                <div class="privacy-toggle ">
+                    <div>
+                        <input type="hidden" name="entry[isPrivate]" value="false">
+                        <input type="checkbox" 
+                               id="privacy" 
+                               name="entry[isPrivate]" 
+                               value="true" 
+                               checked>
+                        <label for="privacy" class="privacy-label">
+                            <i class="fas fa-lock"></i>
+                            Keep this entry private
+                        </label>
+                    </div>
+                    
                 </div>
             </div>
 

@@ -1,1 +1,250 @@
 <% layout("/layouts/boilerplate") %>
+
+<link rel="stylesheet" href="/CSS/public.css">
+
+<!-- Floating Background Elements -->
+<div class="bg-decorations">
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+    <div class="floating-shape shape-3"></div>
+    <div class="floating-shape shape-4"></div>
+</div>
+
+<div class="public-feed-container">
+    <!-- Enhanced Header with Stats -->
+    <div class="feed-header">
+        <div class="header-content">
+            <div class="title-section">
+                <h2 class="feed-title">
+                    <i class="fas fa-globe pulse-icon"></i>
+                    Public Diary Stories
+                    <span class="title-decoration">✨</span>
+                </h2>
+                <p class="feed-subtitle">Discover inspiring stories from our community</p>
+            </div>
+            <div class="header-stats">
+                <div class="stat-card">
+                    <i class="fas fa-book-reader"></i>
+                    <div class="stat-info">
+                        <span class="stat-number"><%= entries ? entries.length : 0 %></span>
+                        <span class="stat-label">Stories</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-heart"></i>
+                    <div class="stat-info">
+                        <span class="stat-number">127</span>
+                        <span class="stat-label">Likes</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-comments"></i>
+                    <div class="stat-info">
+                        <span class="stat-number">45</span>
+                        <span class="stat-label">Comments</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter/Sort Options -->
+    <div class="feed-controls">
+        <div class="filter-section">
+            <button class="filter-btn active" data-filter="all">
+                <i class="fas fa-th"></i>
+                All Stories
+            </button>
+            <button class="filter-btn" data-filter="recent">
+                <i class="fas fa-clock"></i>
+                Recent
+            </button>
+            <button class="filter-btn" data-filter="popular">
+                <i class="fas fa-fire"></i>
+                Popular
+            </button>
+        </div>
+        <div class="mood-filters">
+            <span class="mood-filter" data-mood="😂">😂</span>
+            <span class="mood-filter" data-mood="😀">😀</span>
+            <span class="mood-filter" data-mood="🤗">🤗</span>
+            <span class="mood-filter" data-mood="😤">😤</span>
+            <span class="mood-filter" data-mood="😔">😔</span>
+            <span class="mood-filter" data-mood="😰">😰</span>
+        </div>
+    </div>
+
+    <div class="posts-container">
+        <% if (entries && entries.length > 0) { %>
+            <% entries.forEach((entry, index) => { %>
+                <div class="post-card post-card-<%= index %>" data-mood="<%= entry.mood %>">
+                    <!-- Post Header with Enhanced Design -->
+                    <div class="post-header">
+                        <div class="user-info">
+                            <div class="user-avatar-container">
+                                <div class="user-avatar">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                                <div class="online-indicator"></div>
+                            </div>
+                            <div class="user-details">
+                                <h4 class="username">
+                                    Anonymous Writer
+                                    <span class="verified-badge"><i class="fas fa-check-circle"></i></span>
+                                </h4>
+                                <p class="post-time">
+                                    <i class="far fa-clock"></i>
+                                    <%= new Date(entry.createdAt).toLocaleDateString('en-US', { 
+                                        year: 'numeric', 
+                                        month: 'short', 
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    }) %>
+                                    <span class="time-ago">• 2h ago</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="post-menu">
+                            <div class="mood-indicator">
+                                <span class="mood-emoji"><%= entry.mood %></span>
+                            </div>
+                            <button class="menu-btn">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Enhanced Post Content -->
+                    <div class="post-content">
+                        <h3 class="post-title">
+                            <%= entry.title %>
+                            <div class="title-underline"></div>
+                        </h3>
+                        <div class="post-text">
+                            <%= entry.content %>
+                        </div>
+                        <div class="post-tags">
+                            <span class="tag">#diary</span>
+                            <span class="tag">#life</span>
+                            <span class="tag">#thoughts</span>
+                        </div>
+                    </div>
+
+                    <!-- Enhanced Post Actions -->
+                    <div class="post-actions">
+                        <div class="action-buttons">
+                            <button class="action-btn like-btn" data-entry-id="<%= entry._id %>">
+                                <div class="btn-icon">
+                                    <i class="far fa-heart"></i>
+                                </div>
+                                <span class="like-count">0</span>
+                            </button>
+                            <button class="action-btn comment-btn" onclick="toggleComments('<%= entry._id %>')">
+                                <div class="btn-icon">
+                                    <i class="far fa-comment"></i>
+                                </div>
+                                <span class="comment-count">0</span>
+                            </button>
+                            <button class="action-btn share-btn">
+                                <div class="btn-icon">
+                                    <i class="far fa-share-square"></i>
+                                </div>
+                                <span class="btn-text">Share</span>
+                            </button>
+                        </div>
+                        <div class="post-meta">
+                            <button class="save-btn">
+                                <i class="far fa-bookmark"></i>
+                            </button>
+                            <div class="view-count">
+                                <i class="far fa-eye"></i>
+                                <span>127</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enhanced Comments Section -->
+                    <div class="comments-section" id="comments-<%= entry._id %>" style="display: none;">
+                        <div class="comments-header">
+                            <h4><i class="fas fa-comments"></i> Comments</h4>
+                            <button class="sort-comments">
+                                <i class="fas fa-sort"></i>
+                                Sort by Latest
+                            </button>
+                        </div>
+                        <div class="comments-list">
+                            <!-- Comments will be loaded here -->
+                        </div>
+                        <div class="add-comment">
+                            <div class="comment-input-container">
+                                <div class="comment-user-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <input type="text" placeholder="Add a thoughtful comment..." class="comment-input" id="comment-input-<%= entry._id %>">
+                                <button class="post-comment-btn" onclick="postComment('<%= entry._id %>')">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                            <div class="comment-features">
+                                <button class="emoji-btn">😀</button>
+                                <button class="gif-btn">GIF</button>
+                                <button class="mention-btn">@</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <div class="no-posts">
+                <div class="no-posts-animation">
+                    <div class="no-posts-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="sparkles">
+                        <span class="sparkle">✨</span>
+                        <span class="sparkle">⭐</span>
+                        <span class="sparkle">💫</span>
+                    </div>
+                </div>
+                <h3>No Public Stories Yet</h3>
+                <p>Be the first to share your diary story with the community!</p>
+                <a href="/AI-diary/new" class="cta-button">
+                    <i class="fas fa-plus"></i>
+                    Share Your Story
+                    <span class="button-shine"></span>
+                </a>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- Load More Button -->
+    <% if (entries && entries.length > 0) { %>
+        <div class="load-more-section">
+            <button class="load-more-btn">
+                <i class="fas fa-chevron-down"></i>
+                Load More Stories
+            </button>
+        </div>
+    <% } %>
+</div>
+
+<!-- Floating Action Button -->
+<div class="fab-container">
+    <button class="fab-main">
+        <i class="fas fa-plus"></i>
+    </button>
+    <div class="fab-options">
+        <a href="/AI-diary/new" class="fab-option" data-tooltip="New Entry">
+            <i class="fas fa-pen"></i>
+        </a>
+        <button class="fab-option" data-tooltip="Upload Photo" onclick="uploadPhoto()">
+            <i class="fas fa-camera"></i>
+        </button>
+        <button class="fab-option" data-tooltip="Voice Note" onclick="recordVoice()">
+            <i class="fas fa-microphone"></i>
+        </button>
+    </div>
+</div>
+
+<script src="/js/public.js"></script>

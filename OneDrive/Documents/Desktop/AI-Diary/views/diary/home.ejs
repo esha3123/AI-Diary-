@@ -1,208 +1,468 @@
 <% layout("/layouts/boilerplate") %>
 
-<link rel="stylesheet" href="/CSS/home.css">
+<link rel="stylesheet" href="/CSS/home-professional.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    /* Additional custom animations */
+    .entry-card.professional {
+        animation: fadeInUp 0.8s ease forwards;
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    
+    .entry-card.professional:nth-child(1) { animation-delay: 0.1s; }
+    .entry-card.professional:nth-child(2) { animation-delay: 0.2s; }
+    .entry-card.professional:nth-child(3) { animation-delay: 0.3s; }
+    .entry-card.professional:nth-child(4) { animation-delay: 0.4s; }
+    .entry-card.professional:nth-child(5) { animation-delay: 0.5s; }
+    .entry-card.professional:nth-child(6) { animation-delay: 0.6s; }
+    
+    .analytics-card {
+        animation: slideInFromLeft 0.8s ease forwards;
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    
+    .analytics-card:nth-child(2) { animation-delay: 0.2s; }
+    .analytics-card:nth-child(3) { animation-delay: 0.4s; }
+    
+    @keyframes slideInFromLeft {
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+</style>
 
-<!-- Main Dashboard Container -->
-<div class="dashboard-container">
-    <!-- Welcome Header -->
-    <div class="welcome-section">
-        <div class="welcome-container">
-            <div class="welcome-grid">
-                <div class="welcome-content-area">
-                    <div class="welcome-content">
-                        <h1 class="welcome-title">
-                            Welcome back, <span class="user-name">Nitin/Esha</span> 
-                            <span class="wave-emoji">👋</span>
+<!-- Main Home Container -->
+<div class="home-container">
+    <!-- Professional Background -->
+    <div class="bg-decoration">
+        <div class="bg-pattern"></div>
+        <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+            <div class="shape shape-4"></div>
+        </div>
+    </div>
+
+    <!-- Modern Header Section -->
+    <div class="home-header">
+        <div class="header-container">
+            <div class="header-content">
+                <div class="profile-section">
+                    <div class="profile-avatar">
+                        <div class="avatar-ring">
+                            <img src="/imge/book.png" alt="Profile" class="avatar-image">
+                        </div>
+                        <div class="status-indicator"></div>
+                    </div>
+                    <div class="profile-info">
+                        <h1 class="profile-name">
+                            Nitin/Esha
+                            <i class="fas fa-crown verified-badge"></i>
                         </h1>
-                        <p class="welcome-subtitle">Ready to capture today's thoughts and feelings?</p>
-                        <div class="quick-stats">
-                            <div class="stat-item">
-                                <i class="fas fa-book"></i>
-                                <span>12 Entries</span>
+                        <p class="profile-subtitle">Digital Diary Explorer</p>
+                        <div class="profile-metrics">
+                            <div class="metric">
+                                <span class="metric-number"><%= entries.length %></span>
+                                <span class="metric-label">Entries</span>
                             </div>
-                            <div class="stat-item">
-                                <i class="fas fa-fire"></i>
-                                <span>5 Day Streak</span>
+                            <div class="metric">
+                                <span class="metric-number">5</span>
+                                <span class="metric-label">Day Streak</span>
                             </div>
-                            <div class="stat-item">
-                                <i class="fas fa-heart"></i>
-                                <span>Happy Mood</span>
+                            <div class="metric">
+                                <span class="metric-number">247</span>
+                                <span class="metric-label">Following</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="new-entry-area">
-                    <div class="new-entry-card">
-                        <a href="/AI-diary/new" class="new-entry-btn">
-                            <i class="fas fa-plus"></i>
-                            <span>New Entry</span>
-                        </a>
-                        <p class="new-entry-text">Start writing your thoughts...</p>
-                    </div>
+                
+                <div class="action-section">
+                    <a href="/AI-diary/new" class="create-entry-btn">
+                        <i class="fas fa-plus"></i>
+                        <span>Create Entry</span>
+                    </a>
+                    <button class="settings-btn">
+                        <i class="fas fa-cog"></i>
+                    </button>
                 </div>
+            </div>
+            
+            <!-- Quick Navigation Tabs -->
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-tab="entries">
+                    <i class="fas fa-th-large"></i>
+                    <span>Entries</span>
+                </button>
+                <button class="nav-tab" data-tab="analytics">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
+                </button>
+                <button class="nav-tab" data-tab="insights">
+                    <i class="fas fa-brain"></i>
+                    <span>Insights</span>
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Main Content Grid -->
-    <div class="main-content-container">
-        <div class="content-grid">
-            <!-- Left Column -->
-            <div class="left-column">
-                <!-- Recent Entries Section -->
-                <div class="section-card recent-entries">
-                    <div class="section-header">
-                        <h3><i class="fas fa-clock"></i> Recent Entries</h3>
-                        <a href="/AI-diary/entries" class="view-all-link">View All</a>
+    <!-- Main Content Area -->
+    <div class="home-content">
+        <div class="content-container">
+            <!-- Entries Grid Tab -->
+            <div class="tab-content active" id="entries-tab">
+                <div class="content-header">
+                    <div class="section-title">
+                        <h2>Your Diary Collection</h2>
+                        <p>Explore and manage your thoughts and memories</p>
+                    </div>
+                    <div class="filter-controls">
+                        <div class="filter-group">
+                            <button class="filter-btn active" data-filter="all">
+                                <i class="fas fa-th"></i>
+                                <span>All</span>
+                            </button>
+                            <button class="filter-btn" data-filter="recent">
+                                <i class="fas fa-clock"></i>
+                                <span>Recent</span>
+                            </button>
+                            <button class="filter-btn" data-filter="favorites">
+                                <i class="fas fa-heart"></i>
+                                <span>Favorites</span>
+                            </button>
+                        </div>
+                        <div class="view-toggle">
+                            <button class="view-btn active" data-view="grid">
+                                <i class="fas fa-th-large"></i>
+                            </button>
+                            <button class="view-btn" data-view="list">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Professional Entries Grid -->
+                <div class="entries-grid">
+                    <% for(let entry of entries){ %>
+                        <div class="entry-card professional" data-entry-id="<%= entry._id %>">
+                            <div class="card-header">
+                                <div class="mood-indicator">
+                                    <span class="mood-emoji"><%= entry.mood %></span>
+                                </div>
+                                <div class="entry-actions">
+                                    <button class="action-btn favorite-btn" title="Add to Favorites">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                    <div class="action-dropdown">
+                                        <button class="action-btn dropdown-btn" title="More Options">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <a href="/AI-diary/<%= entry._id %>" class="dropdown-item">
+                                                <i class="fas fa-eye"></i>
+                                                <span>View Details</span>
+                                            </a>
+                                            <a href="/AI-diary/<%= entry._id %>/edit" class="dropdown-item">
+                                                <i class="fas fa-edit"></i>
+                                                <span>Edit Entry</span>
+                                            </a>
+                                            <button class="dropdown-item listen-btn" data-text="<%= entry.content %>">
+                                                <i class="fas fa-volume-up"></i>
+                                                <span>Listen</span>
+                                            </button>
+                                            <hr class="dropdown-divider">
+                                            <form method="post" action="/AI-diary/<%= entry._id %>?_method=delete" style="display: contents;">
+                                                <button class="dropdown-item delete-item" type="submit">
+                                                    <i class="fas fa-trash"></i>
+                                                    <span>Delete</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card-content">
+                                <h3 class="entry-title"><%= entry.title %></h3>
+                                <p class="entry-preview">
+                                    <%= entry.content.substring(0, 150) %><%= entry.content.length > 150 ? '...' : '' %>
+                                </p>
+                                
+                                <div class="entry-footer">
+                                    <div class="entry-date">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        <span><%= entry.createdAt.toLocaleDateString('en-US', { 
+                                            year: 'numeric', 
+                                            month: 'short', 
+                                            day: 'numeric' 
+                                        }) %></span>
+                                    </div>
+                                    <div class="entry-stats">
+                                        <span class="stat" title="Views">
+                                            <i class="fas fa-eye"></i>
+                                            <span>24</span>
+                                        </span>
+                                        <span class="stat" title="Reading Time">
+                                            <i class="fas fa-clock"></i>
+                                            <span>2 min</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card-overlay">
+                                <a href="/AI-diary/<%= entry._id %>" class="overlay-link">
+                                    <div class="overlay-content">
+                                        <i class="fas fa-arrow-right"></i>
+                                        <span>Read More</span>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div class="tab-content" id="analytics-tab">
+                <div class="analytics-section">
+                    <div class="section-title">
+                        <h2>Writing Analytics</h2>
+                        <p>Discover patterns in your writing journey</p>
                     </div>
                     
-                   <!-- Entry Item Loop -->
-<div class="entries-list">
-    <% for(let entry of entries){ %>
-        <a href="/AI-diary/<%= entry._id %>" class="entry-link">
-            <div class="entry-item">
-                <div class="entry-content">
-                    <div class="entry-header">
-                        <h6 class="entry-id"><%= entry.id %></h6>
-                        <h4 class="entry-title"><%= entry.title %></h4>
-                        <span class="entry-mood"><%= entry.mood %></span>
+                    <div class="analytics-grid">
+                        <div class="analytics-card large">
+                            <div class="card-header">
+                                <div class="header-content">
+                                    <h3>Mood Distribution</h3>
+                                    <p>Your emotional journey this month</p>
+                                </div>
+                                <div class="card-icon">
+                                    <i class="fas fa-smile"></i>
+                                </div>
+                            </div>
+                            <div class="mood-chart">
+                                <div class="mood-item">
+                                    <div class="mood-info">
+                                        <span class="mood-emoji">😊</span>
+                                        <span class="mood-name">Happy</span>
+                                    </div>
+                                    <div class="mood-bar">
+                                        <div class="mood-fill happy" style="width: 60%"></div>
+                                    </div>
+                                    <span class="mood-percentage">60%</span>
+                                </div>
+                                <div class="mood-item">
+                                    <div class="mood-info">
+                                        <span class="mood-emoji">😐</span>
+                                        <span class="mood-name">Neutral</span>
+                                    </div>
+                                    <div class="mood-bar">
+                                        <div class="mood-fill neutral" style="width: 30%"></div>
+                                    </div>
+                                    <span class="mood-percentage">30%</span>
+                                </div>
+                                <div class="mood-item">
+                                    <div class="mood-info">
+                                        <span class="mood-emoji">😔</span>
+                                        <span class="mood-name">Sad</span>
+                                    </div>
+                                    <div class="mood-bar">
+                                        <div class="mood-fill sad" style="width: 10%"></div>
+                                    </div>
+                                    <span class="mood-percentage">10%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="analytics-card">
+                            <div class="card-header">
+                                <div class="header-content">
+                                    <h3>Writing Streak</h3>
+                                    <p>Keep the momentum going!</p>
+                                </div>
+                                <div class="card-icon">
+                                    <i class="fas fa-fire"></i>
+                                </div>
+                            </div>
+                            <div class="streak-info">
+                                <div class="streak-visual">
+                                    <div class="streak-circle">
+                                        <div class="streak-number">5</div>
+                                        <div class="streak-label">Days</div>
+                                    </div>
+                                </div>
+                                <div class="streak-details">
+                                    <div class="streak-goal">Goal: 7 days</div>
+                                    <div class="streak-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 71%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="analytics-card">
+                            <div class="card-header">
+                                <div class="header-content">
+                                    <h3>Word Statistics</h3>
+                                    <p>Your writing volume</p>
+                                </div>
+                                <div class="card-icon">
+                                    <i class="fas fa-font"></i>
+                                </div>
+                            </div>
+                            <div class="word-stats">
+                                <div class="stat-item primary">
+                                    <div class="stat-value">2,847</div>
+                                    <div class="stat-label">Total Words</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">237</div>
+                                    <div class="stat-label">Avg per Entry</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">542</div>
+                                    <div class="stat-label">Longest Entry</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <p class="entry-preview"><%= entry.content %></p>
-                    <div class="entry-meta">
-                        <span class="entry-date">
-                            <i class="fas fa-calendar"></i><%= entry.createdAt.toString().split(" ").slice(0,4).join("-") %>
-                        </span>
-                        <div class="entry-actions">
-                            <button class="action-btn view-btn" title="View">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="action-btn listen-btn" title="Listen">
-                                <i class="fas fa-volume-up"></i>
-                            </button>
-                            <button class="action-btn edit-btn" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <form method="post" action="/AI-diary/<%= entry._id %>?_method=delete" style="display: inline;">
-                                <button class="action-btn delete-btn" title="Delete" type="submit">
-                                    <i class="fas fa-trash"></i>
+                </div>
+            </div>
+
+            <!-- Insights Tab -->
+            <div class="tab-content" id="insights-tab">
+                <div class="insights-section">
+                    <div class="section-title">
+                        <h2>AI Insights</h2>
+                        <p>Personalized reflections powered by artificial intelligence</p>
+                    </div>
+                    
+                    <div class="insights-grid">
+                        <div class="insight-card featured">
+                            <div class="insight-badge">
+                                <i class="fas fa-star"></i>
+                                <span>Featured Insight</span>
+                            </div>
+                            <div class="insight-content">
+                                <div class="insight-icon">
+                                    <i class="fas fa-lightbulb"></i>
+                                </div>
+                                <h3>Daily Reflection</h3>
+                                <p>"You've shown remarkable resilience this week. Your entries reflect a growing sense of self-awareness and emotional intelligence. Continue to embrace vulnerability in your writing—it's a sign of strength."</p>
+                                <button class="insight-action">
+                                    <i class="fas fa-refresh"></i>
+                                    <span>Generate New Insight</span>
                                 </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </a>
-    <% } %>
-</div>
-                <!-- AI Cheer-up Box -->
-                <div class="section-card ai-cheerup">
-                    <div class="section-header">
-                        <h3><i class="fas fa-robot"></i> AI Insight</h3>
-                        <span class="ai-badge">Powered by AI</span>
-                    </div>
-                    <div class="cheerup-content">
-                        <div class="ai-message">
-                            <p>"You've been showing great resilience this week! Even through challenging moments, you've maintained a positive outlook. Keep nurturing that inner strength! 💙"</p>
-                        </div>
-                        <button class="refresh-insight-btn">
-                            <i class="fas fa-refresh"></i> Get New Insight
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Column -->
-            <div class="right-column">
-                <!-- Mood Analytics Preview -->
-                <div class="section-card mood-analytics">
-                    <div class="section-header">
-                        <h3><i class="fas fa-chart-line"></i> This Week's Mood</h3>
-                        <a href="/AI-diary/analytics" class="view-details-link">View Details</a>
-                    </div>
-                    <div class="mood-summary">
-                        <div class="mood-stats">
-                            <div class="mood-stat">
-                                <span class="mood-emoji">😊</span>
-                                <span class="mood-count">3</span>
-                                <span class="mood-label">Happy</span>
-                            </div>
-                            <div class="mood-stat">
-                                <span class="mood-emoji">😐</span>
-                                <span class="mood-count">2</span>
-                                <span class="mood-label">Neutral</span>
-                            </div>
-                            <div class="mood-stat">
-                                <span class="mood-emoji">😔</span>
-                                <span class="mood-count">1</span>
-                                <span class="mood-label">Sad</span>
                             </div>
                         </div>
-                        <div class="mood-chart">
-                            <div class="chart-placeholder">
-                                <i class="fas fa-chart-bar"></i>
-                                <span>Mood Trend Chart</span>
+                        
+                        <div class="insight-card">
+                            <div class="insight-content">
+                                <div class="insight-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <h3>Writing Pattern</h3>
+                                <p>You tend to write more on weekends. Consider setting aside 10 minutes during weekdays for consistent reflection and better habit formation.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <div class="insight-content">
+                                <div class="insight-icon">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                                <h3>Emotional Growth</h3>
+                                <p>Your vocabulary for expressing emotions has expanded by 40% since you started. Keep exploring your feelings through diverse descriptive language!</p>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <div class="insight-content">
+                                <div class="insight-icon">
+                                    <i class="fas fa-target"></i>
+                                </div>
+                                <h3>Goal Achievement</h3>
+                                <p>You're 85% closer to your monthly writing goal. Just 3 more entries to reach your target of 20 diary entries this month!</p>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Time Capsule Reminder -->
-                <div class="section-card time-capsule">
-                    <div class="section-header">
-                        <h3><i class="fas fa-hourglass-half"></i> Time Capsule</h3>
-                    </div>
-                    <div class="capsule-content">
-                        <div class="capsule-message">
-                            <i class="fas fa-envelope"></i>
-                            <p><strong>Reminder from 2 weeks ago:</strong></p>
-                            <p>"Don't give up on your dreams! You're stronger than you think! 🌟"</p>
+                    
+                    <!-- Enhanced Quick Actions -->
+                    <div class="quick-actions">
+                        <div class="section-title">
+                            <h3>Quick Actions</h3>
+                            <p>Streamline your diary experience</p>
                         </div>
-                        <span class="capsule-date">Posted: June 20, 2025</span>
-                    </div>
-                </div>
-
-                <!-- Quick Navigation -->
-                <div class="section-card quick-nav">
-                    <div class="section-header">
-                        <h3><i class="fas fa-compass"></i> Quick Links</h3>
-                    </div>
-                    <div class="nav-links">
-                        <a href="/AI-diary/public" class="nav-link">
-                            <i class="fas fa-globe"></i>
-                            <span>Public Wall</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                        <a href="/AI-diary/analytics" class="nav-link">
-                            <i class="fas fa-chart-pie"></i>
-                            <span>Analytics</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                        <a href="/AI-diary/profile" class="nav-link">
-                            <i class="fas fa-user"></i>
-                            <span>Profile</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                        <a href="/logout" class="nav-link logout-link">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Logout</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Theme Toggle -->
-                <div class="theme-toggle-card">
-                    <div class="theme-toggle">
-                        <span class="theme-label">Dark Mode</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="themeToggle">
-                            <span class="toggle-slider"></span>
-                        </label>
+                        <div class="actions-grid">
+                            <a href="/AI-diary/public" class="quick-action">
+                                <div class="action-icon">
+                                    <i class="fas fa-globe"></i>
+                                </div>
+                                <div class="action-content">
+                                    <h4>Public Wall</h4>
+                                    <p>Explore shared stories</p>
+                                </div>
+                            </a>
+                            <a href="/AI-diary/profile" class="quick-action">
+                                <div class="action-icon">
+                                    <i class="fas fa-user-cog"></i>
+                                </div>
+                                <div class="action-content">
+                                    <h4>Profile Settings</h4>
+                                    <p>Customize your experience</p>
+                                </div>
+                            </a>
+                            <button class="quick-action" id="exportBtn">
+                                <div class="action-icon">
+                                    <i class="fas fa-download"></i>
+                                </div>
+                                <div class="action-content">
+                                    <h4>Export Data</h4>
+                                    <p>Download your entries</p>
+                                </div>
+                            </button>
+                            <button class="quick-action" id="themeBtn">
+                                <div class="action-icon">
+                                    <i class="fas fa-palette"></i>
+                                </div>
+                                <div class="action-content">
+                                    <h4>Theme Settings</h4>
+                                    <p>Switch appearance</p>
+                                </div>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Floating Action Button -->
+    <div class="fab-container">
+        <button class="fab" id="mainFab">
+            <i class="fas fa-plus"></i>
+        </button>
+        <div class="fab-menu">
+            <a href="/AI-diary/new" class="fab-option" data-tooltip="New Entry">
+                <i class="fas fa-pen"></i>
+            </a>
+            <button class="fab-option" data-tooltip="Voice Entry" id="voiceEntry">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button class="fab-option" data-tooltip="Quick Note" id="quickNote">
+                <i class="fas fa-sticky-note"></i>
+            </button>
+        </div>
+    </div>
 </div>
 
-<script src="/js/home.js"></script>
+<script src="/js/home-new.js"></script>

@@ -1,0 +1,203 @@
+<% layout("/layouts/boilerplate") %>
+
+<link rel="stylesheet" href="/CSS/edit.css">
+
+<div class="edit-container">
+    <!-- Header Section -->
+    <div class="edit-header">
+        <div class="header-content">
+            <div class="header-left">
+                <a href="/AI-diary/<%= entry._id %>" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Entry</span>
+                </a>
+                <div class="page-title">
+                    <h1>
+                        <i class="fas fa-edit"></i>
+                        Edit Entry
+                    </h1>
+                    <p class="subtitle">Make changes to your diary entry</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="entry-meta">
+                    <span class="created-date">
+                        <i class="far fa-calendar"></i>
+                        Created: <%= new Date(entry.createdAt).toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        }) %>
+                    </span>
+                    <span class="mood-display">
+                        <i class="fas fa-smile"></i>
+                        <span class="mood-emoji"><%= entry.mood %></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Form -->
+    <div class="edit-content">
+        <form action="/AI-diary/<%= entry._id %>?_method=PUT" method="POST" class="edit-form">
+            <!-- Title Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <h3>
+                        <i class="fas fa-heading"></i>
+                        Entry Title
+                    </h3>
+                    <p class="section-description">Give your entry a meaningful title</p>
+                </div>
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="title" 
+                        name="title" 
+                        value="<%= entry.title %>" 
+                        class="form-input title-input"
+                        placeholder="Enter your entry title..."
+                        required
+                    >
+                    <div class="input-border"></div>
+                </div>
+            </div>
+
+            <!-- Content Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <h3>
+                        <i class="fas fa-pen"></i>
+                        Entry Content
+                    </h3>
+                    <p class="section-description">Share your thoughts and experiences</p>
+                </div>
+                <div class="input-group">
+                    <textarea 
+                        id="content" 
+                        name="content" 
+                        class="form-textarea content-textarea"
+                        placeholder="Write your diary entry here..."
+                        rows="8"
+                        required
+                    ><%= entry.content %></textarea>
+                    <div class="input-border"></div>
+                    <div class="char-counter">
+                        <span class="current-count">0</span> / <span class="max-count">5000</span> characters
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mood Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <h3>
+                        <i class="fas fa-smile"></i>
+                        How are you feeling?
+                    </h3>
+                    <p class="section-description">Select the mood that best represents this entry</p>
+                </div>
+                <div class="mood-selector">
+                    <div class="mood-options">
+                        <input type="radio" id="mood-happy" name="mood" value="😀" <%= entry.mood === '😀' ? 'checked' : '' %>>
+                        <label for="mood-happy" class="mood-option">
+                            <span class="mood-emoji">😀</span>
+                            <span class="mood-label">Happy</span>
+                        </label>
+
+                        <input type="radio" id="mood-excited" name="mood" value="😂" <%= entry.mood === '😂' ? 'checked' : '' %>>
+                        <label for="mood-excited" class="mood-option">
+                            <span class="mood-emoji">😂</span>
+                            <span class="mood-label">Excited</span>
+                        </label>
+
+                        <input type="radio" id="mood-grateful" name="mood" value="🤗" <%= entry.mood === '🤗' ? 'checked' : '' %>>
+                        <label for="mood-grateful" class="mood-option">
+                            <span class="mood-emoji">🤗</span>
+                            <span class="mood-label">Grateful</span>
+                        </label>
+
+                        <input type="radio" id="mood-angry" name="mood" value="😤" <%= entry.mood === '😤' ? 'checked' : '' %>>
+                        <label for="mood-angry" class="mood-option">
+                            <span class="mood-emoji">😤</span>
+                            <span class="mood-label">Angry</span>
+                        </label>
+
+                        <input type="radio" id="mood-sad" name="mood" value="😔" <%= entry.mood === '😔' ? 'checked' : '' %>>
+                        <label for="mood-sad" class="mood-option">
+                            <span class="mood-emoji">😔</span>
+                            <span class="mood-label">Sad</span>
+                        </label>
+
+                        <input type="radio" id="mood-anxious" name="mood" value="😰" <%= entry.mood === '😰' ? 'checked' : '' %>>
+                        <label for="mood-anxious" class="mood-option">
+                            <span class="mood-emoji">😰</span>
+                            <span class="mood-label">Anxious</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Privacy Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <h3>
+                        <i class="fas fa-lock"></i>
+                        Privacy Settings
+                    </h3>
+                    <p class="section-description">Control who can see this entry</p>
+                </div>
+                <div class="privacy-controls">
+                    <div class="privacy-option">
+                        <input type="hidden" name="isPrivate" value="false">
+                        <input 
+                            type="checkbox" 
+                            id="isPrivate" 
+                            name="isPrivate" 
+                            value="true" 
+                            <%= entry.isPrivate ? 'checked' : '' %>
+                            class="privacy-checkbox"
+                        >
+                        <label for="isPrivate" class="privacy-label">
+                            <div class="checkbox-custom">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="privacy-text">
+                                <span class="privacy-title">Keep this entry private</span>
+                                <span class="privacy-description">Only you will be able to see this entry</span>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="privacy-note">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Unchecking this will share your entry with the community on the public page</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="form-actions">
+                <div class="action-buttons">
+                    <a href="/AI-diary/<%= entry._id %>" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Update Entry
+                        <div class="btn-ripple"></div>
+                    </button>
+                </div>
+                <div class="form-info">
+                    <div class="save-indicator">
+                        <i class="fas fa-cloud"></i>
+                        <span>Changes will be saved when you click Update</span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/js/edit.js"></script>

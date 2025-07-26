@@ -30,18 +30,20 @@
                 <div class="entry-title-section">
                     <h1 class="entry-title"><%= entry.title %></h1>
                     <div class="entry-actions">
+                        <a href="/AI-diary/<%= entry._id %>/edit">
                         <button class="action-btn edit-btn">
                             <i class="fas fa-edit"></i>
                             Edit
-                        </button>
+                        </button></a>
                         <button class="action-btn share-btn">
                             <i class="fas fa-share"></i>
                             Share
                         </button>
+                        <form method="post" action="/AI-diary/<%= entry._id %>?_method=delete" style="display: inline;">
                         <button class="action-btn delete-btn">
                             <i class="fas fa-trash"></i>
                             Delete
-                        </button>
+                        </button></form>
                     </div>
                 </div>
 
