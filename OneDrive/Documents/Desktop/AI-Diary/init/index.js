@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const sampleEntries = require("./data.js").entries;
 const DiaryEntry = require("../models/schema.js");
 
