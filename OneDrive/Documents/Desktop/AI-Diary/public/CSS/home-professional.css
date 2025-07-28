@@ -740,8 +740,8 @@ body {
 .content-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 3rem;
+    align-items: center;
+    margin-bottom: 2.3rem;
     flex-wrap: wrap;
     gap: 2rem;
 }
@@ -836,7 +836,7 @@ body {
 }
 
 .entry-card.professional {
-    background: var(--bg-card);
+    background: rgba(37, 42, 58, 0.5);
     border-radius: var(--border-radius);
     border: 1px solid var(--border-light);
     transition: var(--transition);
@@ -852,6 +852,7 @@ body {
     transform: translateY(-8px);
     box-shadow: var(--shadow-xl);
     border-color: var(--accent-blue);
+    background: rgba(37, 42, 58, 0.85);
 }
 
 .entry-card.professional:nth-child(1) { animation-delay: 0.1s; }
@@ -873,12 +874,14 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem 1.5rem 0;
+    position: relative;
+    z-index: 10;
 }
 
 .mood-indicator {
-    width: 60px;
-    height: 60px;
-    background: var(--gradient-primary);
+    width: 50px;
+    height: 50px;
+    background: var(--border-color);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -893,6 +896,8 @@ body {
 .entry-actions {
     display: flex;
     gap: 0.5rem;
+    position: relative;
+    z-index: 10;
 }
 
 .action-btn {
@@ -908,6 +913,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    z-index: 10;
 }
 
 .action-btn:hover {
@@ -1044,18 +1051,25 @@ body {
 
 .card-overlay {
     position: absolute;
-    inset: 0;
-    
-   
+    top: 65px; /* Start below the header */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(32, 44, 64, 0.9), 
+        rgba(29, 22, 46, 0.9)
+    );
     opacity: 0;
     transition: var(--transition);
     display: flex;
     align-items: center;
     justify-content: center;
+    pointer-events: none;
 }
 
 .entry-card.professional:hover .card-overlay {
     opacity: 0.95;
+    pointer-events: auto;
 }
 
 .overlay-link {
@@ -1125,8 +1139,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 2rem;
-    padding: 0;
+    padding: 8px;
 }
 
 .header-content h3 {
@@ -1663,7 +1676,7 @@ body {
     }
     
     .card-content {
-        padding: 1rem;
+        /* padding: 1rem; */
     }
     
     .quick-action {

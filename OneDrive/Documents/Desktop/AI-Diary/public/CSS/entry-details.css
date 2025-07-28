@@ -100,7 +100,8 @@ html, body {
 /* Content Grid */
 .content-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 3fr 1fr;
+    grid-template-rows: auto auto;
     gap: 2rem;
 }
 
@@ -108,6 +109,8 @@ html, body {
 .entry-content-section {
     display: flex;
     flex-direction: column;
+    grid-column: 1;
+    grid-row: 1;
 }
 
 .content-card {
@@ -208,6 +211,27 @@ html, body {
 
 /* AI Insights Section */
 .ai-insights-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    grid-column: 2;
+    grid-row: 1 / -1;
+}
+
+/* AI Motivation Card - will be moved below content */
+/* .ai-motivation-card {
+    grid-column: 1 / -1;
+    grid-row: 2;
+} */
+
+/* Specific styling for AI motivation card when moved */
+.insight-card.ai-motivation {
+    
+    grid-row: 2;
+}
+
+/* Analysis and Related Entries - stay on right side */
+.ai-analysis-cards {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
@@ -412,10 +436,22 @@ html, body {
 @media (max-width: 1024px) {
     .content-grid {
         grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+    }
+    
+    .entry-content-section {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    
+    .insight-card.ai-motivation {
+        grid-column: 1;
+        grid-row: 2;
     }
     
     .ai-insights-section {
-        order: -1;
+        grid-column: 1;
+        grid-row: 3;
     }
 }
 

@@ -35,8 +35,8 @@ html, body {
 }
 
 .diary-container {
-    max-width: 800px;
-    margin: 2rem auto;
+    max-width: 1400px;
+    margin: auto;
     padding: 2rem 1rem;
 }
 
@@ -51,7 +51,7 @@ html, body {
 .diary-header {
     text-align: center;
     margin-bottom: 2rem;
-    padding: 2rem 0;
+    padding: 1rem 0;
 }
 
 .diary-header h1 {
