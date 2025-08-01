@@ -6,8 +6,10 @@ const path = require("path");
 const ejsMate=require("ejs-mate");
 const wrapAsync  = require ("./utils/wrapAsync.js");
 const ExpressError  = require ("./utils/ExpressError.js");
+const Comment = require("./models/comment.js");
 const entries = require("./models/schema.js");
 const entriesRoutes = require("./routes/entries.js")
+const commentRoutes = require("./routes/comment.js")
 
 //-----------database connection built---------------------------------
 const mongo_url ="mongodb://127.0.0.1:27017/Dear-diary";
@@ -43,6 +45,7 @@ app.get("/", wrapAsync(async (req,res,next)=>{
     res.render("diary/landing.ejs") 
 }));
 app.use("/AI-diary",entriesRoutes);
+app.use("/AI-diary/:id/comment", commentRoutes)
 
 
 

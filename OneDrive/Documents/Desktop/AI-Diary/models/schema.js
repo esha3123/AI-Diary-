@@ -1,7 +1,7 @@
-const mongoose=require("mongoose")
+const mongoose = require("mongoose");
 const schema = mongoose.Schema;
 
-const diarySchema= new schema({
+const diarySchema = new schema({
     title: {
         type: String,
         required: true
@@ -10,11 +10,11 @@ const diarySchema= new schema({
         type: String,
         required: true
     },
-   mood: {
-    type: String,
-    required: true,
-    enum: ['😂', '😀', '🤗', '😤', '😔', '😰']
-},
+    mood: {
+        type: String,
+        required: true,
+        enum: ['😂', '😀', '🤗', '😤', '😔', '😰']
+    },
     isPrivate: {
         type: Boolean,
         default: true
@@ -22,8 +22,13 @@ const diarySchema= new schema({
     createdAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    comments: [{
+        type: schema.Types.ObjectId,
+        ref: "Comment",
+    }]
 });
 
-const entries = mongoose.model("diaryEntries",diarySchema)
-module.exports = entries;  
+// Check if model exists before creating it
+const entries = mongoose.models.diaryEntries || mongoose.model("diaryEntries", diarySchema);
+module.exports = entries;

@@ -24,9 +24,14 @@ router.post("/new", wrapAsync(async (req,res)=>{
     try {
         console.log("Request body:", req.body);
         
-        // Handle isPrivate field properly
+        // Handle isPrivate field properly - ENSURE DEFAULT
         const entryData = req.body.entry;
-        entryData.isPrivate = entryData.isPrivate === 'true';
+        entryData.isPrivate = entryData.isPrivate === 'true' || entryData.isPrivate === true;
+        
+        // If isPrivate is undefined, default to true (private)
+        if (entryData.isPrivate === undefined) {
+            entryData.isPrivate = true;
+        }
         
         const newentries = new entries(entryData);
         const savedEntry = await newentries.save();
@@ -80,10 +85,10 @@ router.get("/:id/edit", wrapAsync(async (req, res) => {
 router.put("/:id", wrapAsync(async (req, res) => {
     let {id} = req.params;
     const updateData = req.body;
-    
+    entryData.isPrivate = entryData.isPrivate === 'true' || entryData.isPrivate === true;
     // Handle isPrivate field properly
-    if (updateData.isPrivate) {
-        updateData.isPrivate = updateData.isPrivate === 'true';
+     if (updateData.isPrivate === undefined) {
+        entryData.isPrivate = true;
     }
     
     const updatedEntry = await entries.findByIdAndUpdate(id, updateData, {new: true});
@@ -93,4 +98,4 @@ router.put("/:id", wrapAsync(async (req, res) => {
     res.redirect(`/AI-diary/${id}`);
 }));
 
-module.exports = router; 
+module.exports = router;
