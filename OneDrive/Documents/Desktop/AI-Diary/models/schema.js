@@ -19,6 +19,15 @@ const diarySchema = new schema({
         type: Boolean,
         default: true
     },
+    likes: {
+        type: Number,
+        default: 0,
+        min: 0
+    },
+    likedBy: [{
+        type: String,
+        default: []
+    }],
     createdAt: {
         type: Date,
         default: Date.now

@@ -13,13 +13,13 @@ router.post("/", wrapAsync(async (req, res) => {
     foundentries.comments.push(newcomment);
     await newcomment.save();
     await foundentries.save();
-    res.redirect(`/AI-diary/${req.params.id}`);
+    res.redirect(`/AI-diary/public`);
 }))
 //like
 router.patch("/:commentId/like", wrapAsync(async (req, res) => {
     let {id, commentId} = req.params;
     await Comment.findByIdAndUpdate(commentId, {$inc: {count: 1}});
-    res.redirect(`/AI-diary/${id}`);
+    res.redirect(`/AI-diary/public`);
 }));
 //dislike
 router.patch("/:commentId/unlike", wrapAsync(async (req, res) => {
@@ -28,14 +28,14 @@ router.patch("/:commentId/unlike", wrapAsync(async (req, res) => {
     if(comment.count > 0) {
         await Comment.findByIdAndUpdate(commentId, {$inc: {count: -1}});
     }
-    res.redirect(`/AI-diary/${id}`);
+    res.redirect(`/AI-diary/public`);
 }));
 //delete
 router.delete("/:commentId", wrapAsync(async (req, res) => {
     let {id, commentId} = req.params;
-    await entries.findByIdAndUpdate(id, {$pull: {comments: commentId}});
+    // await entries.findByIdAndUpdate(id, {$pull: {comments: commentId}});
     await Comment.findByIdAndDelete(commentId); 
-    res.redirect(`/AI-diary/${id}`);
+    res.redirect(`/AI-diary/public`);
 }));
 
 module.exports = router;

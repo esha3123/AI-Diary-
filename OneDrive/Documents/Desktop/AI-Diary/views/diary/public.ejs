@@ -33,14 +33,30 @@
                 <div class="stat-card">
                     <i class="fas fa-heart"></i>
                     <div class="stat-info">
-                        <span class="stat-number">127</span>
+                        <span class="stat-number">
+                            <% let totalLikes = 0; %>
+                            <% if (entries && entries.length > 0) { %>
+                                <% entries.forEach(entry => { %>
+                                    <% totalLikes += entry.likes || 0; %>
+                                <% }) %>
+                            <% } %>
+                            <%= totalLikes %>
+                        </span>
                         <span class="stat-label">Likes</span>
                     </div>
                 </div>
                 <div class="stat-card">
                     <i class="fas fa-comments"></i>
                     <div class="stat-info">
-                        <span class="stat-number">45</span>
+                        <span class="stat-number">
+                            <% let totalComments = 0; %>
+                            <% if (entries && entries.length > 0) { %>
+                                <% entries.forEach(entry => { %>
+                                    <% totalComments += entry.comments ? entry.comments.length : 0; %>
+                                <% }) %>
+                            <% } %>
+                            <%= totalComments %>
+                        </span>
                         <span class="stat-label">Comments</span>
                     </div>
                 </div>
@@ -109,20 +125,26 @@
                             <div class="mood-indicator">
                                 <span class="mood-emoji"><%= entry.mood %></span>
                             </div>
-                            <button class="menu-btn">
+                            <button class="menu-btn"> 
                                 <i class="fas fa-ellipsis-h"></i>
                             </button>
                         </div>
                     </div>
 
                     <!-- Enhanced Post Content -->
-                    <div class="post-content">
+                    <div class="post-content" onclick="window.location.href='/AI-diary/public/<%= entry._id %>'" style="cursor: pointer;">
                         <h3 class="post-title">
                             <%= entry.title %>
                             <div class="title-underline"></div>
                         </h3>
                         <div class="post-text">
-                            <%= entry.content %>
+                            <%= entry.content.substring(0, 200) %><%= entry.content.length > 200 ? '...' : '' %>
+                            <% if (entry.content.length > 200) { %>
+                                <span class="read-more">
+                                    <i class="fas fa-arrow-right"></i>
+                                    Read more
+                                </span>
+                            <% } %>
                         </div>
                         <div class="post-tags">
                             <span class="tag">#diary</span>
@@ -132,21 +154,26 @@
                     </div>
 
                     <!-- Enhanced Post Actions -->
-                    <div class="post-actions">
+                    <div class="post-actions" onclick="event.stopPropagation();">
                         <div class="action-buttons">
-                            <button class="action-btn like-btn" data-entry-id="<%= entry._id %>">
+                            <% 
+                                const userId = req.ip || 'anonymous_user';
+                                const isLiked = entry.likedBy && entry.likedBy.includes(userId);
+                            %>
+                            <button class="action-btn like-btn" data-entry-id="<%= entry._id %>" 
+                                    data-liked="<%= isLiked ? 'true' : 'false' %>" onclick="event.stopPropagation();">
                                 <div class="btn-icon">
-                                    <i class="far fa-heart"></i>
+                                    <i class="<%= isLiked ? 'fas' : 'far' %> fa-heart"></i>
                                 </div>
-                                <span class="like-count">0</span>
+                                <span class="like-count"><%= entry.likes || 0 %></span>
                             </button>
-                            <button class="action-btn comment-btn" onclick="toggleComments('<%= entry._id %>')">
+                            <button class="action-btn comment-btn" onclick="event.stopPropagation(); toggleComments('<%= entry._id %>')">
                                 <div class="btn-icon">
                                     <i class="far fa-comment"></i>
                                 </div>
-                                <span class="comment-count">0</span>
+                                <span class="comment-count"><%= entry.comments ? entry.comments.length : 0 %></span>
                             </button>
-                            <button class="action-btn share-btn">
+                            <button class="action-btn share-btn" onclick="event.stopPropagation();">
                                 <div class="btn-icon">
                                     <i class="far fa-share-square"></i>
                                 </div>
@@ -154,7 +181,7 @@
                             </button>
                         </div>
                         <div class="post-meta">
-                            <button class="save-btn">
+                            <button class="save-btn" onclick="event.stopPropagation();">
                                 <i class="far fa-bookmark"></i>
                             </button>
                             <div class="view-count">
@@ -174,20 +201,60 @@
                             </button>
                         </div>
                         <div class="comments-list">
-                            <!-- Comments will be loaded here -->
+                            <% if (entry.comments && entry.comments.length > 0) { %>
+                                <% entry.comments.forEach((comment) => { %>
+                                    <div class="comment-item" data-comment-id="<%= comment._id %>">
+                                        <div class="comment-avatar">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <div class="comment-content">
+                                            <div class="comment-author">Anonymous User</div>
+                                            <div class="comment-text"><%= comment.comment %></div>
+                                            <div class="comment-time">
+                                                <i class="far fa-clock"></i> 
+                                                <%= new Date(comment.createdAt).toLocaleDateString('en-US', { 
+                                                    month: 'short', 
+                                                    day: 'numeric',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                }) %>
+                                                <button class="comment-like-btn" onclick="likeComment('<%= entry._id %>', '<%= comment._id %>', this)">
+                                                    <i class="<%= comment.count > 0 ? 'fas' : 'far' %> fa-heart"></i> 
+                                                    <span><%= comment.count %></span>
+                                                </button>
+                                                <button class="comment-unlike-btn" onclick="unlikeComment('<%= entry._id %>', '<%= comment._id %>', this)" 
+                                                        <% if (comment.count <= 0) { %>style="display: none;"<% } %>>
+                                                    <i class="fas fa-heart-broken"></i>
+                                                </button>
+                                                <button class="comment-delete-btn" onclick="deleteComment('<%= entry._id %>', '<%= comment._id %>')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            <% } else { %>
+                                <div class="no-comments">
+                                    <i class="far fa-comment"></i>
+                                    <p>No comments yet. Be the first to share your thoughts!</p>
+                                </div>
+                            <% } %>
                         </div>
                         <div class="add-comment">
-                            <div class="comment-input-container">
-                                <div class="comment-user-avatar">
-                                    <i class="fas fa-user"></i>
+                            <form action="/AI-diary/<%= entry._id %>/comment" method="POST" class="comment-form">
+                                <div class="comment-input-container">
+                                    <div class="comment-user-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <input type="text" name="comment[comment]" placeholder="Add a thoughtful comment..." 
+                                           class="comment-input" id="comment-input-<%= entry._id %>" required>
+                                    <button type="submit" class="post-comment-btn">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
                                 </div>
-                                <input type="text" placeholder="Add a thoughtful comment..." class="comment-input" id="comment-input-<%= entry._id %>">
-                                <button class="post-comment-btn" onclick="postComment('<%= entry._id %>')">
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
-                            </div>
+                            </form>
                             <div class="comment-features">
-                                <button class="emoji-btn">😀</button>
+                                <button class="emoji-btn" onclick="addEmoji('<%= entry._id %>')">😀</button>
                                 <button class="gif-btn">GIF</button>
                                 <button class="mention-btn">@</button>
                             </div>

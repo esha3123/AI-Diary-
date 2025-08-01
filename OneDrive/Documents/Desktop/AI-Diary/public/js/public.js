@@ -14,6 +14,12 @@ function initializeLikeButtons() {
     const likeButtons = document.querySelectorAll('.like-btn');
     
     likeButtons.forEach(button => {
+        // Set initial state based on data-liked attribute
+        const isLiked = button.dataset.liked === 'true';
+        if (isLiked) {
+            button.classList.add('liked');
+        }
+        
         button.addEventListener('click', function(e) {
             e.preventDefault();
             const entryId = this.dataset.entryId;
@@ -25,23 +31,56 @@ function initializeLikeButtons() {
 function toggleLike(button, entryId) {
     const icon = button.querySelector('i');
     const countSpan = button.querySelector('.like-count');
+    const isLiked = button.dataset.liked === 'true';
     let currentCount = parseInt(countSpan.textContent);
     
-    if (button.classList.contains('liked')) {
-        // Unlike
-        button.classList.remove('liked');
-        icon.className = 'far fa-heart';
-        countSpan.textContent = Math.max(0, currentCount - 1);
-        animateButton(button, 'unlike');
-    } else {
-        // Like
-        button.classList.add('liked');
-        icon.className = 'fas fa-heart';
-        countSpan.textContent = currentCount + 1;
-        animateButton(button, 'like');
-        createHeartAnimation(button);
-        showToast('❤️ Liked!', 'success');
-    }
+    // Determine the action based on current state
+    const action = isLiked ? 'unlike' : 'like';
+    const url = `/AI-diary/${entryId}/${action}`;
+    
+    // Disable button to prevent double-clicking
+    button.disabled = true;
+    
+    fetch(url, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (action === 'like') {
+                // Like
+                button.classList.add('liked');
+                button.dataset.liked = 'true';
+                icon.className = 'fas fa-heart';
+                countSpan.textContent = data.likes;
+                animateButton(button, 'like');
+                createHeartAnimation(button);
+                showToast('❤️ Liked!', 'success');
+            } else {
+                // Unlike
+                button.classList.remove('liked');
+                button.dataset.liked = 'false';
+                icon.className = 'far fa-heart';
+                countSpan.textContent = data.likes;
+                animateButton(button, 'unlike');
+                showToast('💔 Unliked', 'info');
+            }
+        } else {
+            // Handle case where user already liked/unliked
+            showToast(data.message || 'Action not allowed', 'warning');
+        }
+    })
+    .catch(error => {
+        console.error('Error toggling like:', error);
+        showToast('Failed to update like', 'error');
+    })
+    .finally(() => {
+        // Re-enable button
+        button.disabled = false;
+    });
 }
 
 function animateButton(button, type) {
@@ -101,35 +140,16 @@ function toggleComments(entryId) {
 }
 
 function loadComments(entryId) {
+    // Comments are already loaded from server, just show them
     const commentsList = document.querySelector(`#comments-${entryId} .comments-list`);
-    
-    // Enhanced mock comments
-    const mockComments = [
-        {
-            author: "Sarah M.",
-            text: "This is so relatable! Thanks for sharing ✨ Your words really touched my heart.",
-            time: "2 hours ago"
-        },
-        {
-            author: "Alex K.",
-            text: "Beautiful writing, really moved me 💙 Keep sharing these amazing thoughts!",
-            time: "5 hours ago"
-        },
-        {
-            author: "Jamie R.",
-            text: "I needed to read this today. Thank you for being so authentic 🌟",
-            time: "1 day ago"
-        }
-    ];
-    
-    commentsList.innerHTML = '';
-    mockComments.forEach((comment, index) => {
-        const commentDiv = createCommentElement(comment);
-        commentDiv.style.animationDelay = `${index * 0.1}s`;
-        commentsList.appendChild(commentDiv);
-    });
-    
-    updateCommentCount(entryId, mockComments.length);
+    if (commentsList) {
+        // Add animation to existing comments
+        const comments = commentsList.querySelectorAll('.comment-item');
+        comments.forEach((comment, index) => {
+            comment.style.animationDelay = `${index * 0.1}s`;
+            comment.classList.add('comment-fade-in');
+        });
+    }
 }
 
 function createCommentElement(comment) {
@@ -157,44 +177,123 @@ function createCommentElement(comment) {
 }
 
 function postComment(entryId) {
-    const input = document.getElementById(`comment-input-${entryId}`);
-    const commentText = input.value.trim();
-    
-    if (commentText === '') {
-        showToast('Please write a comment first!', 'warning');
-        return;
+    // This function is now handled by the form submission
+    // Keep it for backward compatibility but redirect to form submission
+    const form = document.querySelector(`#comments-${entryId} .comment-form`);
+    if (form) {
+        form.submit();
     }
-    
-    const commentsList = document.querySelector(`#comments-${entryId} .comments-list`);
-    const newComment = {
-        author: "You",
-        text: commentText,
-        time: "Just now"
-    };
-    
-    const commentElement = createCommentElement(newComment);
-    commentElement.style.opacity = '0';
-    commentElement.style.transform = 'translateY(20px)';
-    commentsList.insertBefore(commentElement, commentsList.firstChild);
-    
-    // Animate the new comment
-    setTimeout(() => {
-        commentElement.style.transition = 'all 0.4s ease';
-        commentElement.style.opacity = '1';
-        commentElement.style.transform = 'translateY(0)';
-    }, 50);
-    
-    // Update comment count
-    const currentCount = commentsList.children.length;
-    updateCommentCount(entryId, currentCount);
-    
-    // Clear input and show success
-    input.value = '';
-    showCommentSuccess(input);
-    showToast('💬 Comment posted!', 'success');
-    
-    // Add confetti effect
-    createConfetti(input);
+}
+
+// New comment interaction functions
+function likeComment(entryId, commentId, button) {
+    fetch(`/AI-diary/${entryId}/comment/${commentId}/like`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            const icon = button.querySelector('i');
+            const countSpan = button.querySelector('span');
+            let currentCount = parseInt(countSpan.textContent);
+            
+            icon.className = 'fas fa-heart';
+            countSpan.textContent = currentCount + 1;
+            
+            // Show unlike button
+            const unlikeBtn = button.parentElement.querySelector('.comment-unlike-btn');
+            if (unlikeBtn) {
+                unlikeBtn.style.display = 'inline-block';
+            }
+            
+            animateButton(button, 'like');
+            showToast('❤️ Comment liked!', 'success');
+        }
+    })
+    .catch(error => {
+        console.error('Error liking comment:', error);
+        showToast('Failed to like comment', 'error');
+    });
+}
+
+function unlikeComment(entryId, commentId, button) {
+    fetch(`/AI-diary/${entryId}/comment/${commentId}/unlike`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            const likeBtn = button.parentElement.querySelector('.comment-like-btn');
+            const icon = likeBtn.querySelector('i');
+            const countSpan = likeBtn.querySelector('span');
+            let currentCount = parseInt(countSpan.textContent);
+            
+            if (currentCount > 0) {
+                icon.className = 'far fa-heart';
+                countSpan.textContent = currentCount - 1;
+                
+                if (currentCount - 1 <= 0) {
+                    button.style.display = 'none';
+                }
+            }
+            
+            animateButton(button, 'unlike');
+            showToast('💔 Comment unliked', 'info');
+        }
+    })
+    .catch(error => {
+        console.error('Error unliking comment:', error);
+        showToast('Failed to unlike comment', 'error');
+    });
+}
+
+function deleteComment(entryId, commentId) {
+    if (confirm('Are you sure you want to delete this comment?')) {
+        fetch(`/AI-diary/${entryId}/comment/${commentId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                // Remove comment from DOM
+                const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
+                if (commentElement) {
+                    commentElement.style.transition = 'all 0.3s ease';
+                    commentElement.style.opacity = '0';
+                    commentElement.style.transform = 'translateX(-100%)';
+                    
+                    setTimeout(() => {
+                        commentElement.remove();
+                        
+                        // Update comment count
+                        const commentsList = document.querySelector(`#comments-${entryId} .comments-list`);
+                        const commentCount = commentsList.querySelectorAll('.comment-item').length;
+                        updateCommentCount(entryId, commentCount);
+                        
+                        showToast('🗑️ Comment deleted', 'success');
+                    }, 300);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting comment:', error);
+            showToast('Failed to delete comment', 'error');
+        });
+    }
+}
+
+function addEmoji(entryId) {
+    const input = document.getElementById(`comment-input-${entryId}`);
+    const emojis = ['😀', '😂', '😍', '🤔', '👍', '❤️', '🎉', '🔥', '💯', '✨'];
+    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+    input.value += randomEmoji;
+    input.focus();
 }
 
 function updateCommentCount(entryId, count) {

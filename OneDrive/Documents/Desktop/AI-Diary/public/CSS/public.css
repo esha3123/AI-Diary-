@@ -509,6 +509,38 @@ body {
     margin-bottom: 1rem;
 }
 
+.read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--accent-blue);
+    font-weight: 500;
+    font-size: 0.875rem;
+    margin-left: 0.5rem;
+    transition: var(--transition);
+}
+
+.read-more:hover {
+    color: var(--accent-purple);
+    transform: translateX(2px);
+}
+
+.read-more i {
+    font-size: 0.75rem;
+}
+
+.post-content {
+    transition: var(--transition);
+}
+
+.post-content:hover {
+    transform: translateY(-2px);
+}
+
+.post-content:hover .post-title {
+    color: var(--accent-blue);
+}
+
 .post-tags {
     display: flex;
     gap: 0.5rem;
@@ -597,6 +629,12 @@ body {
 
 .like-btn.liked .btn-icon {
     animation: heartPulse 0.6s ease-out;
+}
+
+.like-btn:disabled {
+    opacity: 0.6;
+    pointer-events: none;
+    cursor: not-allowed;
 }
 
 @keyframes heartPulse {
@@ -748,6 +786,59 @@ body {
 .comment-time {
     font-size: 0.75rem;
     color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.comment-like-btn, .comment-unlike-btn, .comment-delete-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.75rem;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.comment-like-btn:hover {
+    color: var(--accent-red);
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+.comment-like-btn.liked {
+    color: var(--accent-red);
+}
+
+.comment-unlike-btn:hover {
+    color: var(--accent-red);
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+.comment-delete-btn:hover {
+    color: var(--accent-red);
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+.no-comments {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+}
+
+.no-comments i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    opacity: 0.5;
+}
+
+.comment-fade-in {
+    animation: fadeInUp 0.3s ease-out;
 }
 
 .add-comment {
