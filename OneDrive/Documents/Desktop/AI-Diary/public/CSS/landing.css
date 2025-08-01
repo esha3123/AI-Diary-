@@ -14,6 +14,12 @@
     --gradient-secondary: linear-gradient(135deg, #56d364 0%, #1f6feb 100%);
 }
 
+/* Responsive Base Styles */
+:root {
+    --mobile-padding: 1rem;
+    --tablet-padding: 2rem;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -21,11 +27,9 @@
 }
 
 body {
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-    line-height: 1.6;
-    overflow-x: hidden;
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
 }
 
 /* Smooth Scrolling */
@@ -145,7 +149,7 @@ html {
     top: 0;
     left: 0;
     width: 100% !important;
-    height: 100% !important;
+    height: 90% !important;
     z-index: 2;
     opacity: 0.6;
 }
@@ -156,7 +160,7 @@ html {
 .hero-content {
     position: relative;
     z-index: 3;
-    padding: 150px 0 50px;
+    /* padding: 150px 0 50px; */
 }
 .hero-text{
       margin-top: 3.5rem;
@@ -172,6 +176,7 @@ html {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    animation: slideInLeft 1s ease-out;
 }
 
 .hero-text p {
@@ -181,11 +186,15 @@ html {
     width: 100%;
     line-height: 2.1;
     text-align: center !;
+    animation: fadeIn 1s ease-out 0.5s forwards;
+    opacity: 0;
 }
 
 .hero-buttons {
     /* margin-bottom: 3rem; */
     text-align: center;
+    animation: fadeIn 1s ease-out 1s forwards;
+    opacity: 0;
 }
 
 .hero-buttons .btn {
@@ -197,6 +206,8 @@ html {
 
 .hero-stats {
     margin-top: 3rem;
+    animation: slideInUp 1s ease-out 1.5s forwards;
+    opacity: 0;
 }
 
 .stat-number {
@@ -224,6 +235,11 @@ html {
     overflow: visible;
 }
 
+.hero-image img {
+    max-width: 100%;
+    height: auto;
+}
+
 /* 3D Animated Book */
 .hero-book-container {
     position: relative;
@@ -248,6 +264,13 @@ html {
 .hero-book:hover {
     transform: rotateX(5deg) rotateY(15deg) scale(1.05);
     animation-play-state: paused;
+}
+
+.book-image {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    margin: 0 auto;
 }
 
 .book-image {
@@ -509,49 +532,76 @@ html {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .hero-text h1 {
-        font-size: 2.5rem;
+    .hero-content {
+        text-align: center;
     }
-    
-    .hero-text p {
-        font-size: 1.1rem;
+
+    .hero-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
     }
-    
+
+    .hero-buttons .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+
     .hero-image {
-        height: 400px;
+        margin-top: 3rem;
+        padding: 0 1rem;
     }
-    
-    .floating-card {
-        padding: 15px;
-        font-size: 0.9rem;
+
+    .navbar-nav {
+        text-align: center;
     }
-    
-    .floating-card i {
-        font-size: 1.2rem;
+
+    .nav-item.d-flex {
+        justify-content: center;
+        margin-top: 1rem;
     }
-    
-    .features-section {
-        padding: 60px 0;
+
+    html {
+        font-size: 14px;
     }
-    
-    .stats-section {
-        padding: 60px 0;
+}
+
+@media (max-width: 576px) {
+    .stat-item {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 2rem;
     }
-    
+
+    .feature-card {
+        margin: 0 1rem 2rem;
+    }
+
     .cta-section {
-        padding: 60px 0;
+        padding: 3rem var(--mobile-padding);
     }
-    
-    .hero-book {
-        width: 200px;
-        height: 280px;
+}
+
+/* Tablet Optimization */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .hero-section {
+        padding: 8rem var(--tablet-padding) 4rem;
     }
-    
-    .book-particles {
-        top: -30px;
-        left: -30px;
-        right: -30px;
-        bottom: -30px;
+
+    .feature-card {
+        margin-bottom: 2rem;
+    }
+}
+
+/* Animation Responsiveness */
+@media (prefers-reduced-motion: reduce) {
+    .animate-on-scroll,
+    .hero-text h1,
+    .hero-text p,
+    .hero-buttons,
+    .feature-card {
+        animation: none !important;
+        transform: none !important;
     }
 }
 
@@ -649,3 +699,93 @@ html {
     clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
     -webkit-clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
 }
+
+/* Hero Section Animations */
+.hero-text h1 {
+    animation: slideInLeft 1s ease-out;
+}
+
+.hero-text p {
+    animation: fadeIn 1s ease-out 0.5s forwards;
+    opacity: 0;
+}
+
+.hero-buttons {
+    animation: fadeIn 1s ease-out 1s forwards;
+    opacity: 0;
+}
+
+/* Book Animation */
+.hero-book {
+    animation: float 6s ease-in-out infinite;
+}
+
+/* Stats Animation */
+.hero-stats {
+    animation: slideInUp 1s ease-out 1.5s forwards;
+    opacity: 0;
+}
+
+/* Feature Cards Animation */
+.feature-card {
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+}
+
+/* Keyframes */
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+html {
+    font-size: 16px;
+}
+
+@media (max-width: 768px) {
+    html {
+        font-size: 14px;
+    }
+}
+
+h1, .h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
+h2, .h2 { font-size: clamp(1.8rem, 4vw, 3rem); }
+h3, .h3 { font-size: clamp(1.5rem, 3vw, 2.5rem); }
+h4, .h4 { font-size: clamp(1.2rem, 2vw, 2rem); }
