@@ -23,9 +23,9 @@ router.post("/register",wrapAsync(async(req,res)=>{
 router.get("/login",(req,res)=>{
    res.render("users/login.ejs")
 });
-router.post("/login",saveredirectUrl,passport.authenticate("local",{failureRedirect:"/login",failureFlash:true}),(req,res)=>{
+router.post("/login",saveredirectUrl,passport.authenticate("local",{failureRedirect:"/AI-diary/login",failureFlash:true}),(req,res)=>{
     req.flash("success","welcome back to the wanderlust")
-    let redirect = res.locals.rediretUrl || "/AI-diary"
+    let redirect = res.locals.redirectUrl || "/AI-diary"
     res.redirect(redirect)
 })
 router.get("/logout",(req,res,next)=>{
@@ -33,7 +33,7 @@ router.get("/logout",(req,res,next)=>{
    if (err){
       return next(err);
    }
-   req.flash("sucess","you are logged out")
+   // req.flash("sucess","you are logged out")
    res.redirect("/AI-diary/login")
  })
 })

@@ -3,6 +3,7 @@ const router = express.Router();
 const wrapAsync  = require ("../utils/wrapAsync.js");
 const ExpressError  = require ("../utils/ExpressError.js");
 const entries = require("../models/schema.js");
+const { isLoggedin } = require("../utils/middleware.js");
 
 // router.get("/login",(req,res)=>{
 //    res.render("diary/login.ejs")
@@ -12,7 +13,7 @@ const entries = require("../models/schema.js");
 //    res.render("diary/register.ejs")
 // })
 
-router.get("/", wrapAsync(async (req,res)=>{
+router.get("/",isLoggedin, wrapAsync(async (req,res)=>{
     const allentries = await entries.find({}).sort({ createdAt: -1 });;
     res.render("diary/home.ejs", {entries: allentries})
 }))
