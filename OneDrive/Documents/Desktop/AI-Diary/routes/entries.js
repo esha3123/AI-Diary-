@@ -4,13 +4,13 @@ const wrapAsync  = require ("../utils/wrapAsync.js");
 const ExpressError  = require ("../utils/ExpressError.js");
 const entries = require("../models/schema.js");
 
-router.get("/login",(req,res)=>{
-   res.render("diary/login.ejs")
-}) 
+// router.get("/login",(req,res)=>{
+//    res.render("diary/login.ejs")
+// }) 
 
-router.get("/register",(req,res)=>{
-   res.render("diary/register.ejs")
-})
+// router.get("/register",(req,res)=>{
+//    res.render("diary/register.ejs")
+// })
 
 router.get("/", wrapAsync(async (req,res)=>{
     const allentries = await entries.find({}).sort({ createdAt: -1 });;

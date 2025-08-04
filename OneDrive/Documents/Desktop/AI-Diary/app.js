@@ -10,6 +10,12 @@ const Comment = require("./models/comment.js");
 const entries = require("./models/schema.js");
 const entriesRoutes = require("./routes/entries.js")
 const commentRoutes = require("./routes/comment.js")
+// const flash = require("connect-flash")
+const passport = require("passport");
+const LocalStrategy=require("passport-local");
+const userRoutes=require("./models/user.js");
+
+
 
 //-----------database connection built---------------------------------
 const mongo_url ="mongodb://127.0.0.1:27017/Dear-diary";
@@ -46,6 +52,7 @@ app.get("/", wrapAsync(async (req,res,next)=>{
 }));
 app.use("/AI-diary",entriesRoutes);
 app.use("/AI-diary/:id/comment", commentRoutes)
+app.use("/AI-diary", userRoutes)
 
 
 
