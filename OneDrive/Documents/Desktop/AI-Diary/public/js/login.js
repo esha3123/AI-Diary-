@@ -117,22 +117,24 @@ function initFormValidation() {
     if (!form) return;
 
     form.addEventListener('submit', (e) => {
-        e.preventDefault();
+        // Don't prevent default - let the form submit normally
         
-        const email = form.querySelector('input[type="email"]').value;
-        const password = form.querySelector('input[type="password"]').value;
+        const username = form.querySelector('input[name="username"]').value;
+        const password = form.querySelector('input[name="password"]').value;
         
-        // Add your validation logic here
-        if (email && password) {
-            const loginBtn = form.querySelector('.login-btn');
-            loginBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
-            
-            // Simulate API call
-            setTimeout(() => {
-                // Replace with your actual login logic
-                window.location.href = '/AI-diary';
-            }, 1500);
+        // Basic validation
+        if (!username || !password) {
+            e.preventDefault(); // Only prevent if validation fails
+            alert('Please fill in all fields');
+            return;
         }
+        
+        // Show loading state
+        const loginBtn = form.querySelector('.login-btn');
+        loginBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Signing In...';
+        
+        // Let the form submit normally to your backend
+        // Don't redirect with JavaScript - let the backend handle it
     });
 }
 
