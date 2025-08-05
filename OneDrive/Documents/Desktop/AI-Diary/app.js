@@ -24,6 +24,21 @@ const mongo_url ="mongodb://127.0.0.1:27017/Dear-diary";
 main().then((res)=>{
     console.log("connected to database: Dear-diary");
     console.log("Database connection state:", mongoose.connection.readyState);
+
+    // Initialize the database with a test entry if it's empty
+    entries.countDocuments().then((count) => {
+        if (count === 0) {
+            const testEntry = new entries({
+                title: "Welcome to AI Diary",
+                content: "This is your first diary entry. Feel free to add more!",
+                mood: "🤗",
+                isPrivate: false,
+                likes: 0,
+                likedBy: []
+            });
+            testEntry.save().then(() => console.log("Test entry created"));
+        }
+    });
 })
 .catch((err)=>{
     console.log("Database connection error:", err.message);

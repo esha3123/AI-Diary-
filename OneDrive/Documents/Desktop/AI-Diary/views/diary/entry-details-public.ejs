@@ -263,15 +263,22 @@
 <script>
 // Scroll to comments function
 function scrollToComments() {
-    document.getElementById('comments-section').scrollIntoView({ 
+    const commentsSection = document.getElementById('comments-section');
+    const commentForm = document.querySelector('.add-comment-detailed');
+    
+    commentsSection.scrollIntoView({ 
         behavior: 'smooth',
         block: 'start'
     });
+    
+    // Show comment form
+    commentForm.classList.add('show');
 }
 
 // Like functionality for detailed view
 document.addEventListener('DOMContentLoaded', function() {
     initializeLikeButtons();
+    initializeCommentForm();
 });
 
 function initializeLikeButtons() {
@@ -331,6 +338,25 @@ function toggleLike(button, entryId) {
     })
     .finally(() => {
         button.disabled = false;
+    });
+}
+
+function initializeCommentForm() {
+    const commentForm = document.querySelector('.add-comment-detailed');
+    const cancelBtn = commentForm.querySelector('.cancel-btn');
+    
+    // Hide form when cancel button is clicked
+    cancelBtn.addEventListener('click', function() {
+        commentForm.classList.remove('show');
+    });
+    
+    // Close form when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!commentForm.contains(e.target) && 
+            !e.target.classList.contains('comment-btn') && 
+            !e.target.closest('.comment-btn')) {
+            commentForm.classList.remove('show');
+        }
     });
 }
 
