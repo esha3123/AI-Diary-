@@ -208,15 +208,7 @@
             const textElements = gsap.utils.toArray('.text-reveal');
             textElements.forEach(text => {
                 gsap.set(text, { opacity: 0, y: 30 });
-                gsap.to(text, {
-                    opacity: 1,
-                    y: 0,
-                    duration: 1,
-                    ease: 'power3.out',
-                    scrollTrigger: {
-                        trigger: text,
-                        start: 'top 85%',
-                    }
+              
                 });
             });
 
