@@ -1,0 +1,264 @@
+<!-- Flash Messages Overlay Container -->
+<div class="flash-overlay-container">
+    <% if(success && success.length){ %>
+        <div class="flash-toast flash-success" id="successToast">
+            <div class="toast-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="toast-content">
+                <h4 class="toast-title">Success!</h4>
+                <p class="toast-message"><%= success %></p>
+            </div>
+            <button type="button" class="toast-close" onclick="closeToast('successToast')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    <% } %>
+    
+    <% if(error && error.length){ %>
+        <div class="flash-toast flash-error" id="errorToast">
+            <div class="toast-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="toast-content">
+                <h4 class="toast-title">Error!</h4>
+                <p class="toast-message"><%= error %></p>
+            </div>
+            <button type="button" class="toast-close" onclick="closeToast('errorToast')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    <% } %>
+</div>
+
+<!-- Flash Messages Styles -->
+<style>
+.flash-overlay-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    pointer-events: none;
+}
+
+.flash-toast {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    min-width: 320px;
+    max-width: 400px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    pointer-events: auto;
+    animation: slideInToast 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease;
+}
+
+.flash-toast:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.flash-success {
+    border-left: 4px solid #10b981;
+}
+
+.flash-error {
+    border-left: 4px solid #ef4444;
+}
+
+.toast-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.flash-success .toast-icon {
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.flash-error .toast-icon {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.toast-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.toast-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    color: #1f2937;
+}
+
+.toast-message {
+    font-size: 0.9rem;
+    margin: 0;
+    color: #6b7280;
+    line-height: 1.4;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toast-close:hover {
+    color: #6b7280;
+    background: rgba(107, 114, 128, 0.1);
+}
+
+/* Animations */
+@keyframes slideInToast {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutToast {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+.flash-toast.closing {
+    animation: slideOutToast 0.3s ease-in forwards;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .flash-overlay-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+    }
+    
+    .flash-toast {
+        min-width: auto;
+        max-width: none;
+        margin-bottom: 0.75rem;
+    }
+}
+
+/* Dark Theme Support */
+@media (prefers-color-scheme: dark) {
+    .flash-toast {
+        background: rgba(31, 41, 55, 0.95);
+        border-color: rgba(75, 85, 99, 0.3);
+    }
+    
+    .toast-title {
+        color: #f9fafb;
+    }
+    
+    .toast-message {
+        color: #d1d5db;
+    }
+    
+    .toast-close {
+        color: #9ca3af;
+    }
+    
+    .toast-close:hover {
+        color: #d1d5db;
+        background: rgba(156, 163, 175, 0.1);
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .flash-toast {
+        border: 2px solid;
+        background: white;
+    }
+    
+    .flash-success {
+        border-color: #059669;
+    }
+    
+    .flash-error {
+        border-color: #dc2626;
+    }
+}
+</style>
+
+<!-- Flash Messages JavaScript -->
+<script>
+// Auto-close toasts after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    const toasts = document.querySelectorAll('.flash-toast');
+    
+    toasts.forEach(toast => {
+        // Auto-close after 5 seconds
+        setTimeout(() => {
+            closeToast(toast.id);
+        }, 5000);
+    });
+});
+
+function closeToast(toastId) {
+    const toast = document.getElementById(toastId);
+    if (toast) {
+        toast.classList.add('closing');
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }
+}
+
+// Keyboard accessibility
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const toasts = document.querySelectorAll('.flash-toast');
+        toasts.forEach(toast => {
+            closeToast(toast.id);
+        });
+    }
+});
+
+// Click outside to close (optional)
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.flash-toast')) return;
+    
+    const toasts = document.querySelectorAll('.flash-toast');
+    if (toasts.length > 0 && !e.target.closest('.flash-overlay-container')) {
+        // Uncomment the next line if you want to close on outside click
+        // toasts.forEach(toast => closeToast(toast.id));
+    }
+});
+</script>

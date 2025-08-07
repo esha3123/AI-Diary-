@@ -35,7 +35,11 @@ const diarySchema = new schema({
     comments: [{
         type: schema.Types.ObjectId,
         ref: "Comment",
-    }]
+    }],
+    owner :{
+        type:schema.Types.ObjectId,
+        ref :"User"
+    }
 });
 
 // Check if model exists before creating it

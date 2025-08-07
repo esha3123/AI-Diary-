@@ -13,7 +13,7 @@ router.post("/register",wrapAsync(async(req,res)=>{
     let {username,email,password}=req.body;
  const newUser = new user({username,email});
   let registeredUser = await user.register(newUser,password);
-//   req.flash("success","welcome to the wanderlust")
+  req.flash("success","Welcome to AI Diary! Registration successful.");
   res.redirect("/AI-diary");
  } catch (e) {
     req.flash("error",e.message)
@@ -24,7 +24,7 @@ router.get("/login",(req,res)=>{
    res.render("users/login.ejs")
 });
 router.post("/login",saveredirectUrl,passport.authenticate("local",{failureRedirect:"/AI-diary/login",failureFlash:true}),(req,res)=>{
-    req.flash("success","welcome back to the wanderlust")
+    req.flash("success","Welcome back to AI Diary!")
     let redirect = res.locals.redirectUrl || "/AI-diary"
     res.redirect(redirect)
 })
@@ -33,7 +33,7 @@ router.get("/logout",(req,res,next)=>{
    if (err){
       return next(err);
    }
-   // req.flash("sucess","you are logged out")
+   req.flash("success","You are logged out successfully")
    res.redirect("/AI-diary/login")
  })
 })

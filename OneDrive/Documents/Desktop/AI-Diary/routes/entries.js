@@ -14,8 +14,14 @@ const { isLoggedin } = require("../utils/middleware.js");
 // })
 
 router.get("/",isLoggedin, wrapAsync(async (req,res)=>{
-    const allentries = await entries.find({}).sort({ createdAt: -1 });;
-    res.render("diary/home.ejs", {entries: allentries})
+    const allentries = await entries.find({}).sort({ createdAt: -1 }).populate('owner');
+    allentries.owner = req.user._id
+    res.render("diary/home.ejs", {
+        
+
+        entries: allentries,
+        currentUser: req.user
+    })
 }))
 
 router.get("/new",(req,res)=>{
@@ -40,7 +46,7 @@ router.post("/new", wrapAsync(async (req,res)=>{
 
 router.get("/public", wrapAsync(async (req,res)=>{
    try {
-       const publicEntries = await entries.find({ isPrivate: false }).populate('comments').sort({ createdAt: -1 });
+       const publicEntries = await entries.find({ isPrivate: false }).populate('comments').sort({ createdAt: -1 }).populate('owner');
        res.render("diary/public.ejs", { entries: publicEntries, req: req });
    } catch (error) {
        console.error("Error fetching public entries:", error);
