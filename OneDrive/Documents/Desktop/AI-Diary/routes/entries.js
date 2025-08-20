@@ -4,6 +4,7 @@ const wrapAsync  = require ("../utils/wrapAsync.js");
 const ExpressError  = require ("../utils/ExpressError.js");
 const entries = require("../models/schema.js");
 const { isLoggedin } = require("../utils/middleware.js");
+const controllerentries=require("../controlers/entries.js")
 
 // router.get("/login",(req,res)=>{
 //    res.render("diary/login.ejs")
@@ -13,64 +14,26 @@ const { isLoggedin } = require("../utils/middleware.js");
 //    res.render("diary/register.ejs")
 // })
 
-router.get("/",isLoggedin, wrapAsync(async (req,res)=>{
-    const allentries = await entries.find({}).sort({ createdAt: -1 }).populate('owner');
-    allentries.owner = req.user._id
-    res.render("diary/home.ejs", {
-        
+router
+    .route("/")
+    .get(isLoggedin, wrapAsync(controllerentries.home))
 
-        entries: allentries,
-        currentUser: req.user
-    })
-}))
+router
+    .route("/new")
+    .get((controllerentries.new))
+    .post( isLoggedin, wrapAsync(controllerentries.newcreated));
 
-router.get("/new",(req,res)=>{
-   res.render("diary/new.ejs")
-})
-router.post("/new", wrapAsync(async (req,res)=>{
-     try {  
-        const entryData = req.body.entry;
-        if (Array.isArray(entryData.isPrivate)) {
-            entryData.isPrivate = entryData.isPrivate[entryData.isPrivate.length - 1] === 'true';
-        } else {
-            entryData.isPrivate = entryData.isPrivate === 'true';
-        }
-        const newentries = new entries(entryData);
-        const savedEntry = await newentries.save();
-        res.redirect("/AI-diary");
-        
-    } catch (error) {
-        res.status(500).send("Error creating entry");
-    }
-}));
+router
+    .route("/public")
+    .get( wrapAsync(controllerentries.publicRoute))
 
-router.get("/public", wrapAsync(async (req,res)=>{
-   try {
-       const publicEntries = await entries.find({ isPrivate: false }).populate('comments').sort({ createdAt: -1 }).populate('owner');
-       res.render("diary/public.ejs", { entries: publicEntries, req: req });
-   } catch (error) {
-       console.error("Error fetching public entries:", error);
-       res.render("diary/public.ejs", { entries: [], req: req });
-   }
-}))
+router  
+    .route("/public/id")
+    .get( wrapAsync(controllerentries.pubprvtroute))
 
-router.get("/public/:id", wrapAsync(async (req,res)=>{
-   try {
-       let {id} = req.params;
-       const publicEntry = await entries.findOne({ _id: id, isPrivate: false }).populate('comments');
-       if (!publicEntry) {
-           throw new ExpressError(404, "Public entry not found");
-       }
-       res.render("diary/entry-details-public.ejs", { entry: publicEntry, req: req });
-   } catch (error) {
-       console.error("Error fetching public entry details:", error);
-       throw new ExpressError(404, "Entry not found");
-   }
-}))
-
-router.get("/analytics",(req,res)=>{
-   res.render("diary/analytics.ejs")
-})
+router
+   .route("/analytics")
+   .get(controllerentries.analytics)
 
 router.get("/profile",(req,res)=>{
    res.render("diary/profile.ejs")
@@ -128,29 +91,43 @@ router.patch("/:id/unlike", wrapAsync(async (req, res) => {
     }
 }));
 
-// Dynamic routes - MUST be at the end to avoid conflicts with specific routes
-router.get("/:id",wrapAsync(async (req,res)=>{
-    let{id}=req.params;
-    const entriesItem = await entries.findById(id);
-    res.render("diary/entry-details.ejs",{entry:entriesItem})
-}))
-
-router.delete("/:id",wrapAsync(async(req,res)=>{
-    let{id}=req.params;
-    const entriesdelete = await entries.findByIdAndDelete(id);
-    res.redirect("/AI-diary")
-}))
-
-router.get("/:id/edit", wrapAsync(async (req, res) => {
+// View entry - only owner can view
+router.get("/:id", isLoggedin, wrapAsync(async (req, res) => {
     let {id} = req.params;
-    const entryDetails = await entries.findById(id); 
-    if (!entryDetails) {
-        throw new ExpressError(404, "Entry not found");
+    
+    // Find entry and check if current user owns it
+    const entriesItem = await entries.findOne({ 
+        _id: id, 
+        owner: req.user._id  // Only find if user owns it
+    }).populate('owner');
+    
+    if (!entriesItem) {
+        req.flash("error", "Entry not found or you don't have permission to view it!");
+        return res.redirect("/AI-diary");
     }
+    
+    res.render("diary/entry-details.ejs", {entry: entriesItem})
+}))
+
+// Edit entry - only owner
+router.get("/:id/edit", isLoggedin, wrapAsync(async (req, res) => {
+    let {id} = req.params;
+    
+    const entryDetails = await entries.findOne({ 
+        _id: id, 
+        owner: req.user._id 
+    });
+    
+    if (!entryDetails) {
+        req.flash("error", "Entry not found or you don't have permission to edit it!");
+        return res.redirect("/AI-diary");
+    }
+    
     res.render("diary/edit.ejs", {entry: entryDetails});
 }));
 
-router.put("/:id", wrapAsync(async (req, res) => {
+// Update entry - only owner
+router.put("/:id", isLoggedin, wrapAsync(async (req, res) => {
     let {id} = req.params;
     const updateData = req.body;
     
@@ -159,8 +136,39 @@ router.put("/:id", wrapAsync(async (req, res) => {
         updateData.isPrivate = updateData.isPrivate === 'true';
     }
 
-    const updatedEntry = await entries.findByIdAndUpdate(id, updateData, {new: true});
-     res.redirect(`/AI-diary/${id}`);
+    // Only update if user owns the entry
+    const updatedEntry = await entries.findOneAndUpdate(
+        { _id: id, owner: req.user._id }, 
+        updateData, 
+        {new: true}
+    );
+    
+    if (!updatedEntry) {
+        req.flash("error", "Entry not found or you don't have permission to edit it!");
+        return res.redirect("/AI-diary");
+    }
+    
+    req.flash("success", "Entry updated successfully!");
+    res.redirect(`/AI-diary/${id}`);
 }));
+
+// Delete entry - only owner
+router.delete("/:id", isLoggedin, wrapAsync(async (req, res) => {
+    let {id} = req.params;
+    
+    // Only delete if user owns the entry
+    const deletedEntry = await entries.findOneAndDelete({ 
+        _id: id, 
+        owner: req.user._id 
+    });
+    
+    if (!deletedEntry) {
+        req.flash("error", "Entry not found or you don't have permission to delete it!");
+        return res.redirect("/AI-diary");
+    }
+    
+    req.flash("success", "Entry deleted successfully!");
+    res.redirect("/AI-diary")
+}))
 
 module.exports = router;

@@ -13,10 +13,21 @@
                 </a>
             </div>
             <div class="entry-meta">
-                <span class="entry-date">March 15, 2024</span>
+                <span class="entry-date">
+                    <%= entry.createdAt.toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    }) %>
+                </span>
                 <span class="entry-mood">
-                    <span class="mood-emoji">😊</span>
-                    Happy
+                    <span class="mood-emoji"><%= entry.mood || '😊' %></span>
+                    <%= entry.mood === '😊' ? 'Happy' : 
+                        entry.mood === '😔' ? 'Sad' : 
+                        entry.mood === '😰' ? 'Anxious' : 
+                        entry.mood === '😤' ? 'Angry' : 
+                        entry.mood === '🤗' ? 'Grateful' : 
+                        'Content' %>
                 </span>
             </div>
         </div>
@@ -59,10 +70,13 @@
                         <span>Written at <%= entry.createdAt.toString().split(" ").slice(0,4).join("-") %></span>
                     </div>
                     <div class="metadata-item">
-                        <i class="fas fa-eye"></i>
-                        <span>Private Entry</span>
+                        <i class="fas fa-<%= entry.isPrivate ? 'lock' : 'globe' %>"></i>
+                        <span><%= entry.isPrivate ? 'Private Entry' : 'Public Entry' %></span>
                     </div>
-                    
+                    <div class="metadata-item">
+                        <i class="fas fa-user"></i>
+                        <span>By <%= entry.owner ? entry.owner.username : 'Unknown' %></span>
+                    </div>
                 </div>
             </div>
         </div>
