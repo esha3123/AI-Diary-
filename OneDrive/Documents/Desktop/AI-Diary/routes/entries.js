@@ -13,7 +13,7 @@ const controllerentries=require("../controlers/entries.js")
 // router.get("/register",(req,res)=>{
 //    res.render("diary/register.ejs")
 // })
-
+ 
 router
     .route("/")
     .get(isLoggedin, wrapAsync(controllerentries.home))

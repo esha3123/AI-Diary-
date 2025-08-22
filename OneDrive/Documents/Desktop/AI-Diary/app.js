@@ -6,10 +6,14 @@ const path = require("path");
 const ejsMate=require("ejs-mate");
 const wrapAsync  = require ("./utils/wrapAsync.js");
 const ExpressError  = require ("./utils/ExpressError.js");
+
+// Load environment variables
+require('dotenv').config();
 const Comment = require("./models/comment.js");
 const entries = require("./models/schema.js");
 const entriesRoutes = require("./routes/entries.js")
 const commentRoutes = require("./routes/comment.js")
+const insightsRoutes = require("./routes/insights.js") // AI insights route
 const session = require("express-session"); // ADD THIS!
 const flash = require("connect-flash");
 const passport = require("passport");
@@ -57,6 +61,7 @@ async function main() {
 app.set("view engine","ejs")
 app.set("views", path.join(__dirname,"views"))
 app.use(express.urlencoded({extended:true}));
+app.use(express.json()); // Add JSON body parser for AI insights
 app.use(methodOverride("_method"))
 app.engine("ejs",ejsMate)
 app.use(express.static(path.join(__dirname, "public")));
@@ -99,6 +104,7 @@ app.get("/", wrapAsync(async (req,res,next)=>{
 // User routes MUST come FIRST to avoid being caught by /:id route
 app.use("/AI-diary", userRoutes);
 app.use("/AI-diary/:id/comment", commentRoutes)
+app.use("/insights", insightsRoutes); // AI insights routes
 app.use("/AI-diary",entriesRoutes);
 
 

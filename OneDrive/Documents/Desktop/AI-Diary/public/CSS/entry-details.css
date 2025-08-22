@@ -1,4 +1,6 @@
 /* Entry Details Page Styles */
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&display=swap');
+
 * {
     margin: 0;
     padding: 0;
@@ -491,5 +493,285 @@ html, body {
     
     .entry-title {
         font-size: 1.5rem;
+    }
+}
+
+/* ====================================
+   AI INSIGHTS SPECIFIC STYLES 
+   ==================================== */
+
+/* AI Insights Card Header */
+.ai-motivation .card-header {
+   border: #0f172a 2px solid;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.ai-motivation .card-header h3 {
+    color: white;
+    margin: 0;
+}
+
+.insight-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.insight-type-select {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    color: white;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.insight-type-select option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+/* AI Controls */
+.ai-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    justify-content: center;
+}
+
+.ai-btn {
+    background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.ai-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.voice-btn {
+    background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.voice-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.voice-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.voice-btn.speaking {
+    background: linear-gradient(135deg, var(--accent-red) 0%, var(--accent-orange) 100%);
+    animation: pulse 1.5s infinite;
+}
+
+/* Loading State */
+.ai-loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+}
+
+.loading-spinner {
+    font-size: 2rem;
+    color: var(--accent-blue);
+    margin-bottom: 1rem;
+}
+
+.loading-text {
+    font-size: 1rem;
+    color: var(--text-muted);
+}
+
+/* Default Message */
+.default-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--accent-blue);
+}
+
+.default-message .ai-avatar {
+    font-size: 2rem;
+    color: var(--accent-blue);
+    flex-shrink: 0;
+}
+
+.default-message .message-content h4 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.default-message .message-content p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+}
+
+.default-message .message-content em {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* AI Insights Result */
+.ai-insights-result {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--accent-purple);
+    animation: slideIn 0.5s ease-out;
+}
+
+.ai-insights-result .ai-avatar {
+    font-size: 2rem;
+    color: var(--accent-purple);
+    flex-shrink: 0;
+}
+
+.ai-insights-result .message-content {
+    flex: 1;
+}
+
+.insight-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.insight-header h4 {
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.insight-badge {
+    background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.insight-text {
+    margin-bottom: 1rem;
+}
+
+.insight-text p {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    font-size: 1.05rem;
+}
+
+.insight-footer {
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.insight-footer small {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.insight-type-label {
+    color: var(--accent-blue);
+    font-weight: 600;
+}
+
+/* Error State */
+.ai-error {
+    padding: 1rem;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: var(--border-radius);
+    text-align: center;
+}
+
+.error-message {
+    color: #ef4444;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+/* Animations */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.voice-animation {
+    animation: pulse 1.5s infinite;
+}
+
+/* Responsive AI Styles */
+@media (max-width: 768px) {
+    .ai-controls {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .ai-btn, .voice-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .insight-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .default-message, .ai-insights-result {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .ai-motivation .card-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
     }
 }
