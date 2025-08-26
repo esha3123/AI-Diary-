@@ -48,4 +48,4 @@ temp/
 # API Keys (extra protection)
 config.js
 secrets.json
-keys.json
+keys.json.env
