@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const OpenAI = require('openai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// Initialize OpenAI with API key from environment
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
+// Initialize Gemini with API key from environment
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 // Generate AI insights for diary entry
 router.post('/generate', async (req, res) => {
@@ -21,10 +20,10 @@ router.post('/generate', async (req, res) => {
         }
 
         // Check if API key exists
-        if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your-key-here') {
+        if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'your_gemini_api_key_here') {
             return res.json({ 
                 success: false, 
-                error: 'OpenAI API key not configured. Please check your .env file!' 
+                error: 'Gemini API key not configured. Please check your .env file!' 
             });
         }
 
@@ -63,21 +62,14 @@ router.post('/generate', async (req, res) => {
                 userPrompt = `Iss diary entry ke baare mein kuch achha insights do yaar, filmy style mein: "${diaryContent}"`;
         }
 
-        // Call OpenAI API
-        const completion = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
-            messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: userPrompt }
-            ],
-            max_tokens: 200,
-            temperature: 0.8, // Higher creativity for filmy responses
-        });
-
-        const insights = completion.choices[0].message.content;
+        // Call Gemini API
+        const prompt = `${systemPrompt}\n\n${userPrompt}`;
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const insights = response.text();
         
         // Log usage for monitoring (optional)
-        console.log(`AI Insight generated - Type: ${insightType}, Tokens used: ~${diaryContent.length + insights.length}`);
+        console.log(`AI Insight generated - Type: ${insightType}, Characters used: ~${diaryContent.length + insights.length}`);
         
         res.json({ 
             success: true, 
@@ -86,23 +78,23 @@ router.post('/generate', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('OpenAI API Error:', error);
+        console.error('Gemini API Error:', error);
         
         // Handle different types of errors
-        if (error.status === 401) {
+        if (error.message?.includes('API_KEY_INVALID')) {
             res.json({ 
                 success: false, 
-                error: 'Invalid API key. Please check your OpenAI credentials!' 
+                error: 'Invalid API key. Please check your Gemini credentials!' 
             });
-        } else if (error.status === 429) {
+        } else if (error.message?.includes('RATE_LIMIT_EXCEEDED')) {
             res.json({ 
                 success: false, 
                 error: 'Rate limit exceeded. Please wait a moment and try again!' 
             });
-        } else if (error.status === 403) {
+        } else if (error.message?.includes('QUOTA_EXCEEDED')) {
             res.json({ 
                 success: false, 
-                error: 'Credits exhausted. Please check your OpenAI billing!' 
+                error: 'Quota exhausted. Please check your Gemini billing!' 
             });
         } else {
             res.json({ 
@@ -113,10 +105,10 @@ router.post('/generate', async (req, res) => {
     }
 });
 
-// Test route to check if OpenAI is working
+// Test route to check if Gemini is working
 router.get('/test', async (req, res) => {
     try {
-        if (!process.env.OPENAI_API_KEY) {
+        if (!process.env.GEMINI_API_KEY) {
             return res.json({ 
                 status: 'error', 
                 message: 'API key missing in .env file!' 
@@ -124,16 +116,14 @@ router.get('/test', async (req, res) => {
         }
 
         // Simple test call
-        const completion = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
-            messages: [{ role: "user", content: "Say 'Hello yaar!' in Hinglish" }],
-            max_tokens: 20
-        });
+        const result = await model.generateContent("Say 'Hello yaar!' in Hinglish");
+        const response = await result.response;
+        const text = response.text();
 
         res.json({ 
             status: 'success', 
-            message: 'OpenAI working perfectly!',
-            response: completion.choices[0].message.content 
+            message: 'Gemini working perfectly!',
+            response: text 
         });
     } catch (error) {
         res.json({ 
