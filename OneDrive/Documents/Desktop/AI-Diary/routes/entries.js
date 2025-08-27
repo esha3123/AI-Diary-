@@ -18,6 +18,9 @@ router
     .route("/")
     .get(isLoggedin, wrapAsync(controllerentries.home))
 
+// Dashboard route (alias for home)
+router.get("/dashboard", isLoggedin, wrapAsync(controllerentries.home));
+
 router
     .route("/new")
     .get(isLoggedin, (controllerentries.new))
@@ -103,7 +106,7 @@ router.get("/:id", isLoggedin, wrapAsync(async (req, res) => {
     
     if (!entriesItem) {
         req.flash("error", "Entry not found or you don't have permission to view it!");
-        return res.redirect("/AI-diary/dashboard");
+        return res.redirect("/AI-diary");
     }
     
     res.render("diary/entry-details.ejs", {entry: entriesItem})
@@ -120,7 +123,7 @@ router.get("/:id/edit", isLoggedin, wrapAsync(async (req, res) => {
     
     if (!entryDetails) {
         req.flash("error", "Entry not found or you don't have permission to edit it!");
-        return res.redirect("/AI-diary/dashboard");
+        return res.redirect("/AI-diary");
     }
     
     res.render("diary/edit.ejs", {entry: entryDetails});
@@ -145,7 +148,7 @@ router.put("/:id", isLoggedin, wrapAsync(async (req, res) => {
     
     if (!updatedEntry) {
         req.flash("error", "Entry not found or you don't have permission to edit it!");
-        return res.redirect("/AI-diary/dashboard");
+        return res.redirect("/AI-diary");
     }
     
     req.flash("success", "Entry updated successfully!");
@@ -164,11 +167,11 @@ router.delete("/:id", isLoggedin, wrapAsync(async (req, res) => {
     
     if (!deletedEntry) {
         req.flash("error", "Entry not found or you don't have permission to delete it!");
-        return res.redirect("/AI-diary/dashboard");
+        return res.redirect("/AI-diary");
     }
     
     req.flash("success", "Entry deleted successfully!");
-    res.redirect("/AI-diary/dashboard")
+    res.redirect("/AI-diary")
 }))
 
 module.exports = router;

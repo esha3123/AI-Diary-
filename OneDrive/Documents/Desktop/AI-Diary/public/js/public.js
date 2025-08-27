@@ -1,24 +1,15 @@
-// Enhanced AI Diary Public Feed JavaScript
-
+// Public Feed - Optimized
 document.addEventListener('DOMContentLoaded', function() {
     initializeLikeButtons();
-    initializeCommentInputs();
-    initializeFilters();
-    initializeFAB();
-    initializeLoadMore();
-    addScrollAnimations();
+    initializeComments();
+    initializeScrollAnimations();
 });
 
-// Enhanced Like functionality
+// Keep like functionality
 function initializeLikeButtons() {
-    const likeButtons = document.querySelectorAll('.like-btn');
-    
-    likeButtons.forEach(button => {
-        // Set initial state based on data-liked attribute
+    document.querySelectorAll('.like-btn').forEach(button => {
         const isLiked = button.dataset.liked === 'true';
-        if (isLiked) {
-            button.classList.add('liked');
-        }
+        if (isLiked) button.classList.add('liked');
         
         button.addEventListener('click', function(e) {
             e.preventDefault();
@@ -32,93 +23,74 @@ function toggleLike(button, entryId) {
     const icon = button.querySelector('i');
     const countSpan = button.querySelector('.like-count');
     const isLiked = button.dataset.liked === 'true';
-    let currentCount = parseInt(countSpan.textContent);
-    
-    // Determine the action based on current state
     const action = isLiked ? 'unlike' : 'like';
-    const url = `/AI-diary/${entryId}/${action}`;
     
-    // Disable button to prevent double-clicking
     button.disabled = true;
     
-    fetch(url, {
+    fetch(`/AI-diary/${entryId}/${action}`, {
         method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json',
-        }
+        headers: { 'Content-Type': 'application/json' }
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             if (action === 'like') {
-                // Like
                 button.classList.add('liked');
                 button.dataset.liked = 'true';
                 icon.className = 'fas fa-heart';
                 countSpan.textContent = data.likes;
-                animateButton(button, 'like');
-                createHeartAnimation(button);
                 showToast('❤️ Liked!', 'success');
             } else {
-                // Unlike
                 button.classList.remove('liked');
                 button.dataset.liked = 'false';
                 icon.className = 'far fa-heart';
                 countSpan.textContent = data.likes;
-                animateButton(button, 'unlike');
                 showToast('💔 Unliked', 'info');
             }
+            // Simple animation
+            button.style.transform = 'scale(1.2)';
+            setTimeout(() => button.style.transform = '', 200);
         } else {
-            // Handle case where user already liked/unliked
             showToast(data.message || 'Action not allowed', 'warning');
         }
     })
     .catch(error => {
-        console.error('Error toggling like:', error);
+        console.error('Error:', error);
         showToast('Failed to update like', 'error');
     })
     .finally(() => {
-        // Re-enable button
         button.disabled = false;
     });
 }
 
-function animateButton(button, type) {
-    button.style.transform = 'scale(1.2)';
-    setTimeout(() => {
-        button.style.transform = '';
-    }, 200);
-}
-
-function createHeartAnimation(button) {
-    const hearts = ['❤️', '💕', '💖', '💝'];
-    const randomHeart = hearts[Math.floor(Math.random() * hearts.length)];
+// Simple comment functionality
+function initializeComments() {
+    // Comment toggle
+    document.querySelectorAll('[onclick*="toggleComments"]').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const entryId = this.onclick.toString().match(/toggleComments\('([^']+)'\)/)[1];
+            toggleComments(entryId);
+        });
+    });
     
-    for (let i = 0; i < 3; i++) {
-        setTimeout(() => {
-            const heart = document.createElement('div');
-            heart.innerHTML = randomHeart;
-            heart.style.cssText = `
-                position: fixed;
-                font-size: 20px;
-                pointer-events: none;
-                z-index: 9999;
-                animation: heartFloat 2s ease-out forwards;
-                user-select: none;
-            `;
-            
-            const rect = button.getBoundingClientRect();
-            heart.style.left = (rect.left + Math.random() * 40 - 20) + 'px';
-            heart.style.top = (rect.top + Math.random() * 20 - 10) + 'px';
-            
-            document.body.appendChild(heart);
-            
-            setTimeout(() => heart.remove(), 2000);
-        }, i * 100);
-    }
+    // Auto-resize comment inputs
+    document.querySelectorAll('.comment-input').forEach(input => {
+        input.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+        
+        // Enter to submit
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.closest('form').submit();
+            }
+        });
+    });
 }
 
-// Enhanced Comments functionality
 function toggleComments(entryId) {
     const commentsSection = document.getElementById(`comments-${entryId}`);
     const commentBtn = document.querySelector(`[onclick="toggleComments('${entryId}')"]`);
@@ -127,11 +99,9 @@ function toggleComments(entryId) {
     if (commentsSection.style.display === 'none' || commentsSection.style.display === '') {
         commentsSection.style.display = 'block';
         icon.className = 'fas fa-comment';
-        loadComments(entryId);
         setTimeout(() => {
             const input = document.getElementById(`comment-input-${entryId}`);
-            input.focus();
-            commentsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            input?.focus();
         }, 100);
     } else {
         commentsSection.style.display = 'none';
@@ -139,392 +109,8 @@ function toggleComments(entryId) {
     }
 }
 
-function loadComments(entryId) {
-    // Comments are already loaded from server, just show them
-    const commentsList = document.querySelector(`#comments-${entryId} .comments-list`);
-    if (commentsList) {
-        // Add animation to existing comments
-        const comments = commentsList.querySelectorAll('.comment-item');
-        comments.forEach((comment, index) => {
-            comment.style.animationDelay = `${index * 0.1}s`;
-            comment.classList.add('comment-fade-in');
-        });
-    }
-}
-
-function createCommentElement(comment) {
-    const commentDiv = document.createElement('div');
-    commentDiv.className = 'comment-item';
-    commentDiv.innerHTML = `
-        <div class="comment-avatar">
-            <i class="fas fa-user"></i>
-        </div>
-        <div class="comment-content">
-            <div class="comment-author">${comment.author}</div>
-            <div class="comment-text">${comment.text}</div>
-            <div class="comment-time">
-                <i class="far fa-clock"></i> ${comment.time}
-                <button class="comment-like-btn" onclick="likeComment(this)">
-                    <i class="far fa-heart"></i> <span>0</span>
-                </button>
-                <button class="comment-reply-btn" onclick="replyToComment(this)">
-                    <i class="fas fa-reply"></i> Reply
-                </button>
-            </div>
-        </div>
-    `;
-    return commentDiv;
-}
-
-function postComment(entryId) {
-    // This function is now handled by the form submission
-    // Keep it for backward compatibility but redirect to form submission
-    const form = document.querySelector(`#comments-${entryId} .comment-form`);
-    if (form) {
-        form.submit();
-    }
-}
-
-// New comment interaction functions
-function likeComment(entryId, commentId, button) {
-    fetch(`/AI-diary/${entryId}/comment/${commentId}/like`, {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    })
-    .then(response => {
-        if (response.ok) {
-            const icon = button.querySelector('i');
-            const countSpan = button.querySelector('span');
-            let currentCount = parseInt(countSpan.textContent);
-            
-            icon.className = 'fas fa-heart';
-            countSpan.textContent = currentCount + 1;
-            
-            // Show unlike button
-            const unlikeBtn = button.parentElement.querySelector('.comment-unlike-btn');
-            if (unlikeBtn) {
-                unlikeBtn.style.display = 'inline-block';
-            }
-            
-            animateButton(button, 'like');
-            showToast('❤️ Comment liked!', 'success');
-        }
-    })
-    .catch(error => {
-        console.error('Error liking comment:', error);
-        showToast('Failed to like comment', 'error');
-    });
-}
-
-function unlikeComment(entryId, commentId, button) {
-    fetch(`/AI-diary/${entryId}/comment/${commentId}/unlike`, {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    })
-    .then(response => {
-        if (response.ok) {
-            const likeBtn = button.parentElement.querySelector('.comment-like-btn');
-            const icon = likeBtn.querySelector('i');
-            const countSpan = likeBtn.querySelector('span');
-            let currentCount = parseInt(countSpan.textContent);
-            
-            if (currentCount > 0) {
-                icon.className = 'far fa-heart';
-                countSpan.textContent = currentCount - 1;
-                
-                if (currentCount - 1 <= 0) {
-                    button.style.display = 'none';
-                }
-            }
-            
-            animateButton(button, 'unlike');
-            showToast('💔 Comment unliked', 'info');
-        }
-    })
-    .catch(error => {
-        console.error('Error unliking comment:', error);
-        showToast('Failed to unlike comment', 'error');
-    });
-}
-
-function deleteComment(entryId, commentId) {
-    if (confirm('Are you sure you want to delete this comment?')) {
-        fetch(`/AI-diary/${entryId}/comment/${commentId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                // Remove comment from DOM
-                const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
-                if (commentElement) {
-                    commentElement.style.transition = 'all 0.3s ease';
-                    commentElement.style.opacity = '0';
-                    commentElement.style.transform = 'translateX(-100%)';
-                    
-                    setTimeout(() => {
-                        commentElement.remove();
-                        
-                        // Update comment count
-                        const commentsList = document.querySelector(`#comments-${entryId} .comments-list`);
-                        const commentCount = commentsList.querySelectorAll('.comment-item').length;
-                        updateCommentCount(entryId, commentCount);
-                        
-                        showToast('🗑️ Comment deleted', 'success');
-                    }, 300);
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error deleting comment:', error);
-            showToast('Failed to delete comment', 'error');
-        });
-    }
-}
-
-function addEmoji(entryId) {
-    const input = document.getElementById(`comment-input-${entryId}`);
-    const emojis = ['😀', '😂', '😍', '🤔', '👍', '❤️', '🎉', '🔥', '💯', '✨'];
-    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-    input.value += randomEmoji;
-    input.focus();
-}
-
-function updateCommentCount(entryId, count) {
-    const commentBtn = document.querySelector(`[onclick="toggleComments('${entryId}')"]`);
-    const countSpan = commentBtn.querySelector('.comment-count');
-    countSpan.textContent = count;
-}
-
-function showCommentSuccess(input) {
-    const originalPlaceholder = input.placeholder;
-    const originalBorderColor = input.style.borderColor;
-    
-    input.placeholder = "Comment posted! ✨";
-    input.style.borderColor = '#10b981';
-    
-    setTimeout(() => {
-        input.placeholder = originalPlaceholder;
-        input.style.borderColor = originalBorderColor;
-    }, 3000);
-}
-
-// Filter functionality
-function initializeFilters() {
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const moodFilters = document.querySelectorAll('.mood-filter');
-    
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            filterBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            
-            const filter = this.dataset.filter;
-            filterPosts(filter);
-        });
-    });
-    
-    moodFilters.forEach(filter => {
-        filter.addEventListener('click', function() {
-            moodFilters.forEach(f => f.classList.remove('active'));
-            this.classList.add('active');
-            
-            const mood = this.dataset.mood;
-            filterByMood(mood);
-        });
-    });
-}
-
-function filterPosts(filter) {
-    const posts = document.querySelectorAll('.post-card');
-    
-    posts.forEach(post => {
-        post.style.display = 'block';
-        post.style.animation = 'slideInUp 0.6s ease-out';
-    });
-    
-    showToast(`Showing ${filter} posts`, 'info');
-}
-
-function filterByMood(mood) {
-    const posts = document.querySelectorAll('.post-card');
-    
-    posts.forEach(post => {
-        const postMood = post.dataset.mood;
-        if (postMood === mood) {
-            post.style.display = 'block';
-            post.style.animation = 'slideInUp 0.6s ease-out';
-        } else {
-            post.style.display = 'none';
-        }
-    });
-    
-    showToast(`Showing posts with ${mood} mood`, 'info');
-}
-
-// Enhanced comment inputs
-function initializeCommentInputs() {
-    const commentInputs = document.querySelectorAll('.comment-input');
-    
-    commentInputs.forEach(input => {
-        input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                const entryId = this.id.replace('comment-input-', '');
-                postComment(entryId);
-            }
-        });
-        
-        input.addEventListener('focus', function() {
-            this.parentElement.classList.add('focused');
-        });
-        
-        input.addEventListener('blur', function() {
-            this.parentElement.classList.remove('focused');
-        });
-        
-        // Auto-resize functionality
-        input.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-        });
-    });
-}
-
-// Share functionality with enhanced options
-document.addEventListener('click', function(e) {
-    if (e.target.closest('.share-btn')) {
-        const postCard = e.target.closest('.post-card');
-        const title = postCard.querySelector('.post-title').textContent;
-        const text = postCard.querySelector('.post-text').textContent.substring(0, 100) + '...';
-        
-        if (navigator.share) {
-            navigator.share({
-                title: title,
-                text: `"${text}" - Check out this inspiring diary entry!`,
-                url: window.location.href
-            }).then(() => {
-                showToast('📤 Shared successfully!', 'success');
-            }).catch(() => {
-                fallbackShare(title, text);
-            });
-        } else {
-            fallbackShare(title, text);
-        }
-    }
-});
-
-function fallbackShare(title, text) {
-    const shareData = `"${title}"\n\n${text}\n\n${window.location.href}`;
-    
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(shareData).then(() => {
-            showToast('📋 Copied to clipboard!', 'success');
-        });
-    } else {
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = shareData;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        showToast('📋 Copied to clipboard!', 'success');
-    }
-}
-
-// Enhanced save/bookmark functionality
-document.addEventListener('click', function(e) {
-    if (e.target.closest('.save-btn')) {
-        const button = e.target.closest('.save-btn');
-        const icon = button.querySelector('i');
-        
-        if (button.classList.contains('saved')) {
-            button.classList.remove('saved');
-            icon.className = 'far fa-bookmark';
-            showToast('📑 Removed from saved', 'info');
-        } else {
-            button.classList.add('saved');
-            icon.className = 'fas fa-bookmark';
-            animateButton(button, 'save');
-            showToast('🔖 Saved to bookmarks!', 'success');
-            createSparkles(button);
-        }
-    }
-});
-
-// Floating Action Button functionality
-function initializeFAB() {
-    const fabMain = document.querySelector('.fab-main');
-    const fabContainer = document.querySelector('.fab-container');
-    
-    if (fabMain) {
-        fabMain.addEventListener('click', function() {
-            fabContainer.classList.toggle('expanded');
-        });
-        
-        // Close FAB when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!fabContainer.contains(e.target)) {
-                fabContainer.classList.remove('expanded');
-            }
-        });
-    }
-}
-
-// Load more functionality
-function initializeLoadMore() {
-    const loadMoreBtn = document.querySelector('.load-more-btn');
-    
-    if (loadMoreBtn) {
-        loadMoreBtn.addEventListener('click', function() {
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-            
-            // Simulate loading
-            setTimeout(() => {
-                this.innerHTML = '<i class="fas fa-chevron-down"></i> Load More Stories';
-                showToast('📚 More stories loaded!', 'success');
-            }, 1500);
-        });
-    }
-}
-
-// Toast notification system
-function showToast(message, type = 'info') {
-    const existingToast = document.querySelector('.toast');
-    if (existingToast) {
-        existingToast.remove();
-    }
-    
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.innerHTML = `
-        <div class="toast-content">
-            <span class="toast-message">${message}</span>
-            <button class="toast-close" onclick="this.parentElement.parentElement.remove()">×</button>
-        </div>
-    `;
-    
-    document.body.appendChild(toast);
-    
-    // Auto remove after 3 seconds
-    setTimeout(() => {
-        if (toast.parentElement) {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateX(100%)';
-            setTimeout(() => toast.remove(), 300);
-        }
-    }, 3000);
-}
-
-// Add scroll animations
-function addScrollAnimations() {
+// Keep scroll animations
+function initializeScrollAnimations() {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -535,210 +121,89 @@ function addScrollAnimations() {
     }, { threshold: 0.1 });
     
     document.querySelectorAll('.post-card').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'all 0.6s ease';
         observer.observe(card);
     });
 }
 
-// Helper functions
-function createSparkles(element) {
-    const sparkles = ['✨', '⭐', '💫', '🌟'];
+// Simple toast notifications
+function showToast(message, type = 'info') {
+    const existingToast = document.querySelector('.toast');
+    existingToast?.remove();
     
-    for (let i = 0; i < 5; i++) {
-        setTimeout(() => {
-            const sparkle = document.createElement('div');
-            sparkle.innerHTML = sparkles[Math.floor(Math.random() * sparkles.length)];
-            sparkle.style.cssText = `
-                position: fixed;
-                font-size: 16px;
-                pointer-events: none;
-                z-index: 9999;
-                animation: sparkleFloat 2s ease-out forwards;
-                user-select: none;
-            `;
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `<span>${message}</span><button onclick="this.parentElement.remove()">×</button>`;
+    
+    Object.assign(toast.style, {
+        position: 'fixed', top: '20px', right: '20px', background: 'var(--bg-card)',
+        border: '1px solid var(--border-color)', borderRadius: 'var(--border-radius-sm)',
+        boxShadow: 'var(--shadow-lg)', zIndex: '10000', padding: '1rem',
+        animation: 'slideIn 0.3s ease-out', minWidth: '250px',
+        color: 'var(--text-primary)', display: 'flex', justifyContent: 'space-between',
+        alignItems: 'center'
+    });
+    
+    const colors = { success: '#10b981', error: '#ef4444', warning: '#f59e0b', info: '#3b82f6' };
+    toast.style.borderLeftColor = colors[type] || colors.info;
+    toast.style.borderLeftWidth = '4px';
+    
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// Comment interaction functions
+function likeComment(entryId, commentId, button) {
+    fetch(`/AI-diary/${entryId}/comment/${commentId}/like`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => {
+        if (response.ok) {
+            const icon = button.querySelector('i');
+            const countSpan = button.querySelector('span');
+            let currentCount = parseInt(countSpan.textContent);
             
-            const rect = element.getBoundingClientRect();
-            sparkle.style.left = (rect.left + Math.random() * 60 - 30) + 'px';
-            sparkle.style.top = (rect.top + Math.random() * 40 - 20) + 'px';
-            
-            document.body.appendChild(sparkle);
-            setTimeout(() => sparkle.remove(), 2000);
-        }, i * 100);
+            icon.className = 'fas fa-heart';
+            countSpan.textContent = currentCount + 1;
+            button.style.transform = 'scale(1.2)';
+            setTimeout(() => button.style.transform = '', 200);
+            showToast('❤️ Comment liked!', 'success');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Failed to like comment', 'error');
+    });
+}
+
+function deleteComment(entryId, commentId) {
+    if (confirm('Delete this comment?')) {
+        fetch(`/AI-diary/${entryId}/comment/${commentId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => {
+            if (response.ok) {
+                const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
+                if (commentElement) {
+                    commentElement.style.transition = 'all 0.3s ease';
+                    commentElement.style.opacity = '0';
+                    setTimeout(() => commentElement.remove(), 300);
+                    showToast('🗑️ Comment deleted', 'success');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Failed to delete comment', 'error');
+        });
     }
 }
 
-function createConfetti(element) {
-    const colors = ['#3b82f6', '#8b5cf6', '#10b981', '#f97316', '#ef4444'];
-    
-    for (let i = 0; i < 10; i++) {
-        setTimeout(() => {
-            const confetti = document.createElement('div');
-            confetti.style.cssText = `
-                position: fixed;
-                width: 8px;
-                height: 8px;
-                background: ${colors[Math.floor(Math.random() * colors.length)]};
-                pointer-events: none;
-                z-index: 9999;
-                animation: confettiFall 3s ease-out forwards;
-            `;
-            
-            const rect = element.getBoundingClientRect();
-            confetti.style.left = (rect.left + Math.random() * 200 - 100) + 'px';
-            confetti.style.top = (rect.top - 20) + 'px';
-            
-            document.body.appendChild(confetti);
-            setTimeout(() => confetti.remove(), 3000);
-        }, i * 50);
-    }
-}
-
-// Placeholder functions for FAB options
-function uploadPhoto() {
-    showToast('📸 Photo upload coming soon!', 'info');
-}
-
-function recordVoice() {
-    showToast('🎤 Voice notes coming soon!', 'info');
-}
-
-function likeComment(button) {
-    const icon = button.querySelector('i');
-    const count = button.querySelector('span');
-    
-    if (button.classList.contains('liked')) {
-        button.classList.remove('liked');
-        icon.className = 'far fa-heart';
-        count.textContent = Math.max(0, parseInt(count.textContent) - 1);
-    } else {
-        button.classList.add('liked');
-        icon.className = 'fas fa-heart';
-        count.textContent = parseInt(count.textContent) + 1;
-        animateButton(button, 'like');
-    }
-}
-
-function replyToComment(button) {
-    showToast('💬 Reply feature coming soon!', 'info');
-}
-
-// Add enhanced CSS animations
-const enhancedStyle = document.createElement('style');
-enhancedStyle.textContent = `
-    @keyframes heartFloat {
-        0% {
-            transform: translateY(0) scale(1) rotate(0deg);
-            opacity: 1;
-        }
-        100% {
-            transform: translateY(-80px) scale(1.5) rotate(20deg);
-            opacity: 0;
-        }
-    }
-    
-    @keyframes sparkleFloat {
-        0% {
-            transform: translateY(0) scale(1) rotate(0deg);
-            opacity: 1;
-        }
-        100% {
-            transform: translateY(-60px) scale(0.5) rotate(180deg);
-            opacity: 0;
-        }
-    }
-    
-    @keyframes confettiFall {
-        0% {
-            transform: translateY(0) rotate(0deg);
-            opacity: 1;
-        }
-        100% {
-            transform: translateY(200px) rotate(720deg);
-            opacity: 0;
-        }
-    }
-    
-    .toast {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: var(--bg-card);
-        border: 1px solid var(--border-color);
-        border-radius: var(--border-radius-sm);
-        box-shadow: var(--shadow-lg);
-        z-index: 10000;
-        animation: toastSlideIn 0.3s ease-out;
-        min-width: 250px;
-    }
-    
-    .toast-success { border-left: 4px solid var(--accent-green); }
-    .toast-warning { border-left: 4px solid var(--accent-orange); }
-    .toast-info { border-left: 4px solid var(--accent-blue); }
-    .toast-error { border-left: 4px solid var(--accent-red); }
-    
-    .toast-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-    }
-    
-    .toast-message {
-        color: var(--text-primary);
-        font-size: 0.875rem;
-        font-weight: 500;
-    }
-    
-    .toast-close {
-        background: none;
-        border: none;
-        color: var(--text-muted);
-        cursor: pointer;
-        font-size: 1.25rem;
-        padding: 0;
-        margin-left: 1rem;
-    }
-    
-    @keyframes toastSlideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    
-    .comment-like-btn, .comment-reply-btn {
-        background: none;
-        border: none;
-        color: var(--text-muted);
-        cursor: pointer;
-        font-size: 0.75rem;
-        margin-left: 1rem;
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        transition: var(--transition);
-    }
-    
-    .comment-like-btn:hover, .comment-reply-btn:hover {
-        color: var(--accent-blue);
-        background: rgba(59, 130, 246, 0.1);
-    }
-    
-    .comment-like-btn.liked {
-        color: var(--accent-red);
-    }
-    
-    .fab-expanded .fab-options {
-        opacity: 1 !important;
-        visibility: visible !important;
-        transform: translateY(-10px) !important;
-    }
-    
-    .comment-input-container.focused {
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        border-radius: 20px;
-    }
-`;
-document.head.appendChild(enhancedStyle);
+// Global functions for backward compatibility
+window.toggleComments = toggleComments;
+window.likeComment = likeComment;
+window.deleteComment = deleteComment;

@@ -1,1 +1,343 @@
 <% layout("/layouts/boilerplate") %>
+
+<link rel="stylesheet" href="/CSS/analytics.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<div class="analytics-container">
+    <!-- Header Section -->
+    <div class="analytics-header">
+        <div class="header-content">
+            <div class="header-text">
+                <h1 class="analytics-title">
+                    <i class="fas fa-chart-line"></i>
+                    Your Journey Analytics
+                </h1>
+                <p class="analytics-subtitle">Deep insights into your writing patterns and emotional journey</p>
+            </div>
+            <div class="header-visual">
+                <div class="stats-circle">
+                    <span class="circle-number"><%= analytics.totalEntries %></span>
+                    <span class="circle-label">Total Entries</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="quick-stats">
+        <div class="stat-card streak-card">
+            <div class="stat-icon">
+                <i class="fas fa-fire"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number"><%= analytics.currentStreak %></span>
+                <span class="stat-label">Days Streak</span>
+                <div class="stat-description">Your current writing momentum</div>
+            </div>
+        </div>
+
+        <div class="stat-card active-card">
+            <div class="stat-icon">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number"><%= analytics.daysActive %></span>
+                <span class="stat-label">Active Days</span>
+                <div class="stat-description">Total days you've written</div>
+            </div>
+        </div>
+
+        <div class="stat-card words-card">
+            <div class="stat-icon">
+                <i class="fas fa-pen-fancy"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number"><%= analytics.wordStats.totalWords.toLocaleString() %></span>
+                <span class="stat-label">Total Words</span>
+                <div class="stat-description">Your complete story so far</div>
+            </div>
+        </div>
+
+        <div class="stat-card avg-card">
+            <div class="stat-icon">
+                <i class="fas fa-chart-bar"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number"><%= analytics.wordStats.avgWordsPerEntry %></span>
+                <span class="stat-label">Avg. Words</span>
+                <div class="stat-description">Average words per entry</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Analytics Grid -->
+    <div class="analytics-grid">
+        <!-- Mood Distribution Chart -->
+        <div class="chart-card mood-chart-card">
+            <div class="card-header">
+                <h3><i class="fas fa-heart"></i> Mood Distribution</h3>
+                <p>Your emotional journey mapped</p>
+            </div>
+            <div class="chart-content">
+                <div class="mood-stats">
+                    <% analytics.moodDistribution.forEach(mood => { %>
+                        <div class="mood-item" data-mood="<%= mood.emoji %>">
+                            <div class="mood-visual">
+                                <div class="mood-emoji"><%= mood.emoji %></div>
+                                <div class="mood-bar">
+                                    <div class="mood-fill" style="width: <%= analytics.totalEntries > 0 ? (mood.count / analytics.totalEntries * 100) : 0 %>%"></div>
+                                </div>
+                            </div>
+                            <div class="mood-info">
+                                <span class="mood-name"><%= mood.name %></span>
+                                <span class="mood-count"><%= mood.count %> entries</span>
+                                <span class="mood-percentage"><%= analytics.totalEntries > 0 ? Math.round(mood.count / analytics.totalEntries * 100) : 0 %>%</span>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Writing Patterns -->
+        <div class="chart-card pattern-card">
+            <div class="card-header">
+                <h3><i class="fas fa-clock"></i> Writing Patterns</h3>
+                <p>When you write your best thoughts</p>
+            </div>
+            <div class="chart-content">
+                <div class="time-heatmap">
+                    <% for(let hour = 0; hour < 24; hour += 2) { %>
+                        <div class="time-slot" data-hour="<%= hour %>">
+                            <div class="time-label"><%= hour.toString().padStart(2, '0') %>:00</div>
+                            <div class="time-activity" style="opacity: <%= Math.random() * 0.8 + 0.2 %>"></div>
+                        </div>
+                    <% } %>
+                </div>
+                <div class="pattern-insights">
+                    <div class="insight-item">
+                        <i class="fas fa-sun"></i>
+                        <span>Most active: Morning hours</span>
+                    </div>
+                    <div class="insight-item">
+                        <i class="fas fa-moon"></i>
+                        <span>Deep thoughts: Evening reflection</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Word Cloud Section -->
+        <div class="chart-card wordcloud-card">
+            <div class="card-header">
+                <h3><i class="fas fa-cloud"></i> Word Insights</h3>
+                <p>Your most meaningful expressions</p>
+            </div>
+            <div class="chart-content">
+                <div class="word-stats-grid">
+                    <div class="word-stat">
+                        <div class="word-stat-number"><%= analytics.wordStats.longestEntry %></div>
+                        <div class="word-stat-label">Longest Entry</div>
+                    </div>
+                    <div class="word-stat">
+                        <div class="word-stat-number"><%= analytics.wordStats.avgWordsPerEntry %></div>
+                        <div class="word-stat-label">Avg Length</div>
+                    </div>
+                    <div class="word-stat">
+                        <div class="word-stat-number"><%= Math.ceil(analytics.wordStats.totalWords / 250) %></div>
+                        <div class="word-stat-label">Pages Written</div>
+                    </div>
+                </div>
+                <div class="word-cloud">
+                    <span class="word-item" style="font-size: 2.5em; color: #3b82f6;">life</span>
+                    <span class="word-item" style="font-size: 2em; color: #8b5cf6;">thoughts</span>
+                    <span class="word-item" style="font-size: 1.8em; color: #10b981;">journey</span>
+                    <span class="word-item" style="font-size: 1.5em; color: #f59e0b;">dreams</span>
+                    <span class="word-item" style="font-size: 2.2em; color: #ef4444;">feelings</span>
+                    <span class="word-item" style="font-size: 1.6em; color: #06b6d4;">hope</span>
+                    <span class="word-item" style="font-size: 1.4em; color: #8b5cf6;">future</span>
+                    <span class="word-item" style="font-size: 1.7em; color: #10b981;">growth</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Insights Section -->
+        <div class="chart-card ai-insights-card">
+            <div class="card-header">
+                <h3><i class="fas fa-brain"></i> AI Insights</h3>
+                <p>Personalized analysis of your journey</p>
+            </div>
+            <div class="chart-content">
+                <div class="insights-container">
+                    <div class="insight-card">
+                        <div class="insight-icon mood-insight">
+                            <i class="fas fa-smile"></i>
+                        </div>
+                        <div class="insight-content">
+                            <h4>Emotional Growth</h4>
+                            <p>You show consistent positive development in your emotional awareness and self-reflection.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-icon growth-insight">
+                            <i class="fas fa-seedling"></i>
+                        </div>
+                        <div class="insight-content">
+                            <h4>Writing Progress</h4>
+                            <p>Your writing consistency has improved by <strong>40%</strong> compared to last month.</p>
+                        </div>
+                    </div>
+
+                    <div class="insight-card">
+                        <div class="insight-icon reflection-insight">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div class="insight-content">
+                            <h4>Reflection Quality</h4>
+                            <p>Your entries show deeper introspection and meaningful self-discovery patterns.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="generate-insights">
+                    <button class="insights-btn" onclick="generateAIInsights()">
+                        <i class="fas fa-magic"></i>
+                        Generate New Insights
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity Timeline -->
+        <div class="chart-card timeline-card">
+            <div class="card-header">
+                <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                <p>Your latest writing journey</p>
+            </div>
+            <div class="chart-content">
+                <div class="timeline">
+                    <% if (entries.length > 0) { %>
+                        <% entries.slice(0, 5).forEach((entry, index) => { %>
+                            <div class="timeline-item">
+                                <div class="timeline-date">
+                                    <%= new Date(entry.createdAt).toLocaleDateString('en-US', { 
+                                        month: 'short', 
+                                        day: 'numeric' 
+                                    }) %>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-entry">
+                                        <div class="entry-mood"><%= entry.mood || '😐' %></div>
+                                        <div class="entry-info">
+                                            <h4><%= entry.title %></h4>
+                                            <p><%= entry.content.substring(0, 100) %>...</p>
+                                            <span class="entry-words"><%= entry.content.split(' ').length %> words</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="no-entries">
+                            <i class="fas fa-pen"></i>
+                            <p>Start writing to see your activity timeline!</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievement Cards -->
+        <div class="chart-card achievements-card">
+            <div class="card-header">
+                <h3><i class="fas fa-trophy"></i> Achievements</h3>
+                <p>Your writing milestones</p>
+            </div>
+            <div class="chart-content">
+                <div class="achievements-grid">
+                    <div class="achievement <%= analytics.totalEntries >= 10 ? 'unlocked' : 'locked' %>">
+                        <div class="achievement-icon">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <div class="achievement-info">
+                            <h4>First Steps</h4>
+                            <p>Write 10 entries</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: <%= Math.min(analytics.totalEntries / 10 * 100, 100) %>%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="achievement <%= analytics.currentStreak >= 7 ? 'unlocked' : 'locked' %>">
+                        <div class="achievement-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="achievement-info">
+                            <h4>Week Warrior</h4>
+                            <p>7-day writing streak</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: <%= Math.min(analytics.currentStreak / 7 * 100, 100) %>%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="achievement <%= analytics.wordStats.totalWords >= 1000 ? 'unlocked' : 'locked' %>">
+                        <div class="achievement-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="achievement-info">
+                            <h4>Wordsmith</h4>
+                            <p>Write 1000 words</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: <%= Math.min(analytics.wordStats.totalWords / 1000 * 100, 100) %>%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="achievement <%= analytics.daysActive >= 30 ? 'unlocked' : 'locked' %>">
+                        <div class="achievement-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="achievement-info">
+                            <h4>Dedicated</h4>
+                            <p>30 active days</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: <%= Math.min(analytics.daysActive / 30 * 100, 100) %>%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="cta-section">
+        <div class="cta-card">
+            <div class="cta-content">
+                <h3>Ready to continue your journey?</h3>
+                <p>Your story is just beginning. Keep writing, keep growing, keep discovering yourself.</p>
+                <div class="cta-buttons">
+                    <a href="/AI-diary/new" class="cta-btn primary">
+                        <i class="fas fa-pen"></i>
+                        Write New Entry
+                    </a>
+                    <a href="/AI-diary" class="cta-btn secondary">
+                        <i class="fas fa-home"></i>
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
+            <div class="cta-visual">
+                <div class="floating-elements">
+                    <i class="fas fa-heart"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/analytics.js"></script>

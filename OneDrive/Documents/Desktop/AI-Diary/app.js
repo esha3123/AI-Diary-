@@ -100,20 +100,22 @@ app.use((req, res, next) => {
 });
 
 //-----------routing----------------------------------
+// Landing page route (must come before other routes)
 app.get("/", wrapAsync(async (req,res,next)=>{
     res.render("diary/landing.ejs") 
 }));
 
 // User routes MUST come FIRST to avoid being caught by /:id route
 app.use("/AI-diary", userRoutes);
-app.use("/AI-diary/:id/comment", commentRoutes)
+
+// Insights and TTS routes
 app.use("/insights", insightsRoutes); // AI insights routes
 app.use("/tts", ttsRoutes); // TTS routes
 
-// Comment routes (require authentication)
-app.use("/AI-diary/:id/comment", commentRoutes)
+// Comment routes (require authentication) - keep this before entries routes
+app.use("/AI-diary/:id/comment", commentRoutes);
 
-// Main entries routes (most require authentication)
+// Main entries routes (most require authentication) - this should come LAST
 app.use("/AI-diary", entriesRoutes);
 
 

@@ -1,6 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const textToSpeech = require('@google-cloud/text-to-speech');
+let textToSpeech = null;
+try {
+    textToSpeech = require('@google-cloud/text-to-speech');
+} catch (error) {
+    console.log('Google Cloud TTS not available, using mock service only');
+}
 const fs = require('fs');
 const path = require('path');
 const { isLoggedin } = require("../utils/middleware.js");
@@ -13,7 +18,7 @@ let useMockService = true; // Default to mock service
 
 function initializeTTSClient() {
     try {
-        if (useMockService) {
+        if (useMockService || !textToSpeech) {
             console.log('Using mock TTS service for development');
             if (!client) {
                 client = new MockTTSService();
@@ -39,6 +44,36 @@ const audioDir = path.join(__dirname, '../public/audio');
 if (!fs.existsSync(audioDir)) {
     fs.mkdirSync(audioDir, { recursive: true });
 }
+
+// Simple test route (no authentication required)
+router.get('/test', async (req, res) => {
+    try {
+        console.log('TTS Test Route Hit');
+        
+        // Initialize mock TTS client
+        const ttsClient = new MockTTSService();
+        
+        const testText = "यह एक test है - This is a test of the TTS system";
+        const request = { input: { text: testText } };
+        
+        const [response] = await ttsClient.synthesizeSpeech(request);
+        
+        res.json({
+            success: true,
+            message: 'TTS test successful!',
+            useBrowserTTS: response.browserTTSData ? true : false,
+            data: response.browserTTSData || null
+        });
+        
+    } catch (error) {
+        console.error('TTS Test Error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'TTS test failed',
+            details: error.message
+        });
+    }
+});
 
 // Route to generate TTS for a specific entry
 router.post('/generate/:id', isLoggedin, async (req, res) => {

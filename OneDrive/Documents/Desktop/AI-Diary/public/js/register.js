@@ -1,10 +1,18 @@
+// Register Page - Optimized (Keep particles animation)
 document.addEventListener('DOMContentLoaded', function() {
-    // Particle background
+    initParticleBackground();
+    initPasswordToggle();
+    initFormValidation();
+});
+
+// Keep particle background animation intact
+function initParticleBackground() {
     const canvas = document.getElementById('particles-canvas');
+    if (!canvas) return;
+    
     const ctx = canvas.getContext('2d');
     let particles = [];
 
-    // Set canvas size
     function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -13,7 +21,6 @@ document.addEventListener('DOMContentLoaded', function() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Particle class
     class Particle {
         constructor() {
             this.x = Math.random() * canvas.width;
@@ -29,7 +36,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (this.size > 0.2) this.size -= 0.1;
 
-            // Wrap around screen
             if (this.x < 0) this.x = canvas.width;
             if (this.x > canvas.width) this.x = 0;
             if (this.y < 0) this.y = canvas.height;
@@ -44,7 +50,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Create particles
     function init() {
         particles = [];
         for (let i = 0; i < 100; i++) {
@@ -52,7 +57,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Animate particles
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         particles.forEach((particle, index) => {
@@ -68,77 +72,53 @@ document.addEventListener('DOMContentLoaded', function() {
 
     init();
     animate();
+}
 
-    // Password visibility toggle
-    const passwordInput = document.querySelector('input[type="password"]');
-    const togglePassword = document.querySelector('.password-toggle');
+// Simple password toggle
+function initPasswordToggle() {
+    const toggle = document.querySelector('.password-toggle');
+    const input = document.querySelector('input[type="password"]');
 
-    if (togglePassword) {
-        togglePassword.addEventListener('click', function() {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            
-            // Toggle eye icon
-            const eyeIcon = this.querySelector('i');
-            eyeIcon.classList.toggle('fa-eye');
-            eyeIcon.classList.toggle('fa-eye-slash');
-        });
-    }
-
-    // Form validation
-    const registerForm = document.getElementById('registerForm');
-    if (registerForm) {
-        registerForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const username = document.querySelector('input[name="username"]').value;
-            const email = document.querySelector('input[name="email"]').value;
-            const password = document.querySelector('input[name="password"]').value;
-
-            // Basic validation
-            if (username.length < 3) {
-                showError('Username must be at least 3 characters long');
-                return;
-            }
-
-            if (!isValidEmail(email)) {
-                showError('Please enter a valid email address');
-                return;
-            }
-
-            if (password.length < 6) {
-                showError('Password must be at least 6 characters long');
-                return;
-            }
-
-            // If validation passes, submit the form
-            this.submit();
-        });
-    }
-
-    // Helper functions
-    function showError(message) {
-        // You can implement custom error display logic here
-        alert(message);
-    }
-
-    function isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
-
-    // Social login buttons
-    const socialButtons = document.querySelectorAll('.social-btn');
-    socialButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const provider = this.classList.contains('google') ? 'Google' :
-                           this.classList.contains('github') ? 'GitHub' :
-                           this.classList.contains('twitter') ? 'Twitter' : '';
-            
-            if (provider) {
-                // Implement social login logic here
-                console.log(`Initiating ${provider} login...`);
-            }
-        });
+    toggle?.addEventListener('click', function() {
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+        
+        const icon = this.querySelector('i');
+        icon.classList.toggle('fa-eye');
+        icon.classList.toggle('fa-eye-slash');
     });
-});
+}
+
+// Basic form validation
+function initFormValidation() {
+    const form = document.getElementById('registerForm');
+    if (!form) return;
+
+    form.addEventListener('submit', function(e) {
+        const username = this.querySelector('input[name="username"]').value;
+        const email = this.querySelector('input[name="email"]').value;
+        const password = this.querySelector('input[name="password"]').value;
+
+        if (username.length < 3) {
+            e.preventDefault();
+            alert('Username must be at least 3 characters long');
+            return;
+        }
+
+        if (!isValidEmail(email)) {
+            e.preventDefault();
+            alert('Please enter a valid email address');
+            return;
+        }
+
+        if (password.length < 6) {
+            e.preventDefault();
+            alert('Password must be at least 6 characters long');
+            return;
+        }
+    });
+}
+
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}

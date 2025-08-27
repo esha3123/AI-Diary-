@@ -178,6 +178,6 @@ module.exports.analytics = async (req, res) => {
     } catch (error) {
         console.error("Error fetching analytics:", error);
         req.flash("error", "Error loading analytics");
-        res.redirect("/AI-diary/dashboard");
+        res.redirect("/AI-diary");
     }
 }

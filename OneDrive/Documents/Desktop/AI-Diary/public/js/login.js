@@ -1,12 +1,11 @@
-// Login Page Animations and Interactions
+// Login Page - Optimized (Keep particles animation)
 document.addEventListener('DOMContentLoaded', function() {
     initParticleBackground();
     initPasswordToggle();
     initFormValidation();
-    initSocialButtons();
 });
 
-// Particle Background Animation
+// Keep particle background animation intact
 function initParticleBackground() {
     const canvas = document.getElementById('particles-canvas');
     if (!canvas) return;
@@ -14,7 +13,6 @@ function initParticleBackground() {
     const ctx = canvas.getContext('2d');
     let particles = [];
 
-    // Set canvas size
     function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -23,7 +21,6 @@ function initParticleBackground() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Particle class
     class Particle {
         constructor() {
             this.x = Math.random() * canvas.width;
@@ -52,7 +49,6 @@ function initParticleBackground() {
         }
     }
 
-    // Create particles
     function createParticles() {
         particles = [];
         const particleCount = Math.min(100, (canvas.width * canvas.height) / 10000);
@@ -61,7 +57,6 @@ function initParticleBackground() {
         }
     }
 
-    // Animation loop
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
@@ -94,63 +89,39 @@ function initParticleBackground() {
     animate();
 }
 
-// Password visibility toggle
+// Simple password toggle
 function initPasswordToggle() {
-    const passwordToggle = document.querySelector('.password-toggle');
-    const passwordInput = document.querySelector('input[type="password"]');
+    const toggle = document.querySelector('.password-toggle');
+    const input = document.querySelector('input[type="password"]');
 
-    if (passwordToggle && passwordInput) {
-        passwordToggle.addEventListener('click', () => {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            
-            const icon = passwordToggle.querySelector('i');
-            icon.classList.toggle('fa-eye');
-            icon.classList.toggle('fa-eye-slash');
-        });
-    }
+    toggle?.addEventListener('click', () => {
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+        
+        const icon = toggle.querySelector('i');
+        icon.classList.toggle('fa-eye');
+        icon.classList.toggle('fa-eye-slash');
+    });
 }
 
-// Form validation and submission
+// Basic form validation
 function initFormValidation() {
     const form = document.getElementById('loginForm');
     if (!form) return;
 
     form.addEventListener('submit', (e) => {
-        // Don't prevent default - let the form submit normally
-        
         const username = form.querySelector('input[name="username"]').value;
         const password = form.querySelector('input[name="password"]').value;
         
-        // Basic validation
         if (!username || !password) {
-            e.preventDefault(); // Only prevent if validation fails
+            e.preventDefault();
             alert('Please fill in all fields');
             return;
         }
         
-        // Show loading state
         const loginBtn = form.querySelector('.login-btn');
-        loginBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Signing In...';
-        
-        // Let the form submit normally to your backend
-        // Don't redirect with JavaScript - let the backend handle it
-    });
-}
-
-// Social login buttons hover effects
-function initSocialButtons() {
-    const socialButtons = document.querySelectorAll('.social-btn');
-    
-    socialButtons.forEach(btn => {
-        btn.addEventListener('mouseenter', (e) => {
-            const icon = e.currentTarget.querySelector('i');
-            icon.style.transform = 'scale(1.2)';
-        });
-
-        btn.addEventListener('mouseleave', (e) => {
-            const icon = e.currentTarget.querySelector('i');
-            icon.style.transform = 'scale(1)';
-        });
+        if (loginBtn) {
+            loginBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Signing In...';
+        }
     });
 }
