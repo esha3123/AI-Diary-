@@ -25,7 +25,9 @@ const User = require("./models/user.js");
 
 
 //-----------database connection built---------------------------------
-const mongo_url ="mongodb://127.0.0.1:27017/Dear-diary";
+// const mongo_url ="mongodb://127.0.0.1:27017/Dear-diary";
+let dburl = process.env.MONGO_DB_ATLAS ;
+
 main().then((res)=>{
     console.log("connected to database: Dear-diary");
     console.log("Database connection state:", mongoose.connection.readyState);
@@ -51,7 +53,7 @@ main().then((res)=>{
 
 async function main() {
    try {
-       await mongoose.connect(mongo_url);
+       await mongoose.connect(dburl);
        console.log("MongoDB connected successfully");
    } catch (error) {
        console.log("MongoDB connection failed:", error);
@@ -69,7 +71,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 //---------session configuration--------------------------
 const sessionOptions = {
-    secret: "mysupersecretsecret",
+    secret: process.env.SESSION_SECRET || "mysupersecretsecret",
     resave: false,
     saveUninitialized: true,
     cookie: {
