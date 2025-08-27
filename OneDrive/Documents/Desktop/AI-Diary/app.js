@@ -14,6 +14,7 @@ const entries = require("./models/schema.js");
 const entriesRoutes = require("./routes/entries.js")
 const commentRoutes = require("./routes/comment.js")
 const insightsRoutes = require("./routes/insights.js") // AI insights route
+const ttsRoutes = require("./routes/tts.js") // TTS routes
 const session = require("express-session"); // ADD THIS!
 const flash = require("connect-flash");
 const passport = require("passport");
@@ -105,7 +106,13 @@ app.get("/", wrapAsync(async (req,res,next)=>{
 app.use("/AI-diary", userRoutes);
 app.use("/AI-diary/:id/comment", commentRoutes)
 app.use("/insights", insightsRoutes); // AI insights routes
-app.use("/AI-diary",entriesRoutes);
+app.use("/tts", ttsRoutes); // TTS routes
+
+// Comment routes (require authentication)
+app.use("/AI-diary/:id/comment", commentRoutes)
+
+// Main entries routes (most require authentication)
+app.use("/AI-diary", entriesRoutes);
 
 
 //--------error handling-------------------------------

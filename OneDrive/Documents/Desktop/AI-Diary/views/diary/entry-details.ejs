@@ -50,6 +50,10 @@
                             <i class="fas fa-share"></i>
                             Share
                         </button>
+                        <button class="action-btn tts-btn" onclick="generateTTS('<%= entry._id %>')">
+                            <i class="fas fa-volume-up"></i>
+                            Filmy Voice
+                        </button>
                         <form method="post" action="/AI-diary/<%= entry._id %>?_method=delete" style="display: inline;">
                         <button class="action-btn delete-btn">
                             <i class="fas fa-trash"></i>
@@ -404,6 +408,86 @@ document.addEventListener('DOMContentLoaded', () => {
     // You can uncomment this to auto-generate insights
     // setTimeout(generateAIInsights, 1000);
 });
+
+// INLINE FIXED TTS FUNCTION for Entry Details
+window.generateTTS = async function(entryId) {
+    console.log('🎯 Entry Details TTS called for:', entryId);
+    
+    const button = document.querySelector('.tts-btn');
+    if (!button) {
+        alert('TTS button not found!');
+        return;
+    }
+    
+    const originalText = button.innerHTML;
+    
+    // Force button to work
+    button.disabled = false;
+    button.removeAttribute('disabled');
+    button.style.pointerEvents = 'auto';
+    
+    try {
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+        button.classList.add('generating');
+        
+        const response = await fetch(`/tts/generate/${entryId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.error || 'TTS failed');
+        }
+        
+        button.disabled = false;
+        button.classList.remove('generating');
+        
+        if (data.useBrowserTTS && window.speechSynthesis) {
+            button.innerHTML = '<i class="fas fa-volume-up"></i> Speaking...';
+            button.classList.add('playing');
+            
+            speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(data.text);
+            utterance.lang = 'hi-IN';
+            utterance.pitch = 0.7;
+            utterance.rate = 0.8;
+            
+            utterance.onstart = () => {
+                alert('� Filmy voiceover शुरू!');
+            };
+            
+            utterance.onend = () => {
+                button.innerHTML = '<i class="fas fa-volume-up"></i> Filmy Voice';
+                button.classList.remove('playing');
+                button.disabled = false;
+            };
+            
+            utterance.onerror = () => {
+                button.innerHTML = '<i class="fas fa-volume-up"></i> Try Again';
+                button.classList.remove('playing');
+                button.disabled = false;
+            };
+            
+            speechSynthesis.speak(utterance);
+        } else {
+            alert('🎵 TTS Generated! ' + (data.message || ''));
+            button.innerHTML = originalText;
+        }
+        
+    } catch (error) {
+        button.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+        button.classList.remove('generating', 'playing');
+        button.disabled = false;
+        alert('❌ Error: ' + error.message);
+        
+        setTimeout(() => {
+            button.innerHTML = originalText;
+        }, 3000);
+    }
+};
 </script>
 
 <script src="/js/entry-details.js"></script>

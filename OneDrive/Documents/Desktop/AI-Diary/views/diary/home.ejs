@@ -73,12 +73,12 @@
                                 <span class="metric-label">Entries</span>
                             </div>
                             <div class="metric">
-                                <span class="metric-number">5</span>
+                                <span class="metric-number"><%= analytics.currentStreak %></span>
                                 <span class="metric-label">Day Streak</span>
                             </div>
                             <div class="metric">
-                                <span class="metric-number">247</span>
-                                <span class="metric-label">Following</span>
+                                <span class="metric-number"><%= analytics.daysActive %></span>
+                                <span class="metric-label">Active Days</span>
                             </div>
                         </div>
                     </div>
@@ -174,9 +174,9 @@
                                                 <i class="fas fa-edit"></i>
                                                 <span>Edit Entry</span>
                                             </a>
-                                            <button class="dropdown-item listen-btn" data-text="<%= entry.content %>">
+                                            <button class="dropdown-item listen-btn" onclick="generateTTS('<%= entry._id %>')">
                                                 <i class="fas fa-volume-up"></i>
-                                                <span>Listen</span>
+                                                <span>Filmy Voiceover</span>
                                             </button>
                                             <hr class="dropdown-divider">
                                             <form method="post" action="/AI-diary/<%= entry._id %>?_method=delete" style="display: contents;">
@@ -251,36 +251,33 @@
                                 </div>
                             </div>
                             <div class="mood-chart">
-                                <div class="mood-item">
-                                    <div class="mood-info">
-                                        <span class="mood-emoji">😊</span>
-                                        <span class="mood-name">Happy</span>
+                                <% if (analytics.moodDistribution && analytics.totalEntries > 0) { %>
+                                    <% 
+                                    const totalMoodEntries = analytics.moodDistribution.reduce((sum, mood) => sum + mood.count, 0);
+                                    const topMoods = analytics.moodDistribution
+                                        .filter(mood => mood.count > 0)
+                                        .sort((a, b) => b.count - a.count)
+                                        .slice(0, 3);
+                                    %>
+                                    <% topMoods.forEach(mood => { %>
+                                        <% const percentage = totalMoodEntries > 0 ? Math.round((mood.count / totalMoodEntries) * 100) : 0; %>
+                                        <div class="mood-item">
+                                            <div class="mood-info">
+                                                <span class="mood-emoji"><%= mood.emoji %></span>
+                                                <span class="mood-name"><%= mood.name %></span>
+                                            </div>
+                                            <div class="mood-bar">
+                                                <div class="mood-fill <%= mood.name.toLowerCase() %>" style="width: <%- percentage %>%"></div>
+                                            </div>
+                                            <span class="mood-percentage"><%= percentage %>%</span>
+                                        </div>
+                                    <% }) %>
+                                <% } else { %>
+                                    <div style="text-align: center; color: #94a3b8; padding: 2rem;">
+                                        <i class="fas fa-smile" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                        <p>Start writing to see your mood patterns!</p>
                                     </div>
-                                    <div class="mood-bar">
-                                        <div class="mood-fill happy" style="width: 60%"></div>
-                                    </div>
-                                    <span class="mood-percentage">60%</span>
-                                </div>
-                                <div class="mood-item">
-                                    <div class="mood-info">
-                                        <span class="mood-emoji">😐</span>
-                                        <span class="mood-name">Neutral</span>
-                                    </div>
-                                    <div class="mood-bar">
-                                        <div class="mood-fill neutral" style="width: 30%"></div>
-                                    </div>
-                                    <span class="mood-percentage">30%</span>
-                                </div>
-                                <div class="mood-item">
-                                    <div class="mood-info">
-                                        <span class="mood-emoji">😔</span>
-                                        <span class="mood-name">Sad</span>
-                                    </div>
-                                    <div class="mood-bar">
-                                        <div class="mood-fill sad" style="width: 10%"></div>
-                                    </div>
-                                    <span class="mood-percentage">10%</span>
-                                </div>
+                                <% } %>
                             </div>
                         </div>
                         
@@ -297,7 +294,7 @@
                             <div class="streak-info">
                                 <div class="streak-visual">
                                     <div class="streak-circle">
-                                        <div class="streak-number">5</div>
+                                        <div class="streak-number"><%= analytics.currentStreak %></div>
                                         <div class="streak-label">Days</div>
                                     </div>
                                 </div>
@@ -305,7 +302,8 @@
                                     <div class="streak-goal">Goal: 7 days</div>
                                     <div class="streak-progress">
                                         <div class="progress-bar">
-                                            <div class="progress-fill" style="width: 71%"></div>
+                                            <% const streakProgress = Math.min((analytics.currentStreak / 7) * 100, 100); %>
+                                            <div class="progress-fill" style="width: <%- streakProgress %>%"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -324,15 +322,15 @@
                             </div>
                             <div class="word-stats">
                                 <div class="stat-item primary">
-                                    <div class="stat-value">2,847</div>
+                                    <div class="stat-value"><%= analytics.wordStats.totalWords.toLocaleString() %></div>
                                     <div class="stat-label">Total Words</div>
                                 </div>
                                 <div class="stat-item">
-                                    <div class="stat-value">237</div>
+                                    <div class="stat-value"><%= analytics.wordStats.avgWordsPerEntry %></div>
                                     <div class="stat-label">Avg per Entry</div>
                                 </div>
                                 <div class="stat-item">
-                                    <div class="stat-value">542</div>
+                                    <div class="stat-value"><%= analytics.wordStats.longestEntry %></div>
                                     <div class="stat-label">Longest Entry</div>
                                 </div>
                             </div>
@@ -359,11 +357,17 @@
                                 <div class="insight-icon">
                                     <i class="fas fa-lightbulb"></i>
                                 </div>
-                                <h3>Daily Reflection</h3>
-                                <p>"You've shown remarkable resilience this week. Your entries reflect a growing sense of self-awareness and emotional intelligence. Continue to embrace vulnerability in your writing—it's a sign of strength."</p>
-                                <button class="insight-action">
+                                <h3>AI Daily Reflection</h3>
+                                <div id="featuredInsight">
+                                    <% if (analytics.totalEntries > 0) { %>
+                                        <p>You have written <%= analytics.totalEntries %> entries with a <%= analytics.currentStreak %>-day streak! Your journey shows consistency and dedication to self-reflection.</p>
+                                    <% } else { %>
+                                        <p>Welcome to your diary journey! Start by writing your first entry to unlock personalized AI insights about your writing patterns and emotional growth.</p>
+                                    <% } %>
+                                </div>
+                                <button class="insight-action" onclick="generateFullInsight()">
                                     <i class="fas fa-refresh"></i>
-                                    <span>Generate New Insight</span>
+                                    <span>Generate AI Insight</span>
                                 </button>
                             </div>
                         </div>
@@ -374,7 +378,13 @@
                                     <i class="fas fa-chart-line"></i>
                                 </div>
                                 <h3>Writing Pattern</h3>
-                                <p>You tend to write more on weekends. Consider setting aside 10 minutes during weekdays for consistent reflection and better habit formation.</p>
+                                <% if (analytics.currentStreak > 0) { %>
+                                    <p>Excellent! You're on a <%= analytics.currentStreak %>-day writing streak. Consistency is key to developing a healthy habit of self-reflection.</p>
+                                <% } else if (analytics.totalEntries > 0) { %>
+                                    <p>You've written <%= analytics.totalEntries %> entries across <%= analytics.daysActive %> days. Try to write more regularly for better habit formation.</p>
+                                <% } else { %>
+                                    <p>Start your writing journey today! Regular diary writing helps with self-awareness and emotional processing.</p>
+                                <% } %>
                             </div>
                         </div>
                         
@@ -384,7 +394,13 @@
                                     <i class="fas fa-heart"></i>
                                 </div>
                                 <h3>Emotional Growth</h3>
-                                <p>Your vocabulary for expressing emotions has expanded by 40% since you started. Keep exploring your feelings through diverse descriptive language!</p>
+                                <% if (analytics.wordStats.totalWords > 100) { %>
+                                    <p>You've written <%= analytics.wordStats.totalWords.toLocaleString() %> words total! Your vocabulary for self-expression is expanding with each entry.</p>
+                                <% } else if (analytics.totalEntries > 0) { %>
+                                    <p>Keep writing to explore your emotions more deeply. Each entry helps you understand yourself better.</p>
+                                <% } else { %>
+                                    <p>Writing about your emotions helps process feelings and develop emotional intelligence. Start today!</p>
+                                <% } %>
                             </div>
                         </div>
                         
@@ -394,7 +410,15 @@
                                     <i class="fas fa-target"></i>
                                 </div>
                                 <h3>Goal Achievement</h3>
-                                <p>You're 85% closer to your monthly writing goal. Just 3 more entries to reach your target of 20 diary entries this month!</p>
+                                <% 
+                                const monthlyGoal = 20;
+                                const progress = Math.min((analytics.totalEntries / monthlyGoal) * 100, 100);
+                                %>
+                                <% if (analytics.totalEntries >= monthlyGoal) { %>
+                                    <p>🎉 Congratulations! You've exceeded your monthly goal of <%= monthlyGoal %> entries. Keep up the amazing work!</p>
+                                <% } else { %>
+                                    <p>You're <%= Math.round(progress) %>% closer to your monthly goal. Just <%= monthlyGoal - analytics.totalEntries %> more entries to reach your target!</p>
+                                <% } %>
                             </div>
                         </div>
                     </div>
@@ -467,5 +491,606 @@
         </div>
     </div>
 </div>
+
+<!-- AI Insights JavaScript -->
+<script>
+// Server-side data for client-side use
+const serverData = {
+    totalEntries: <%- analytics.totalEntries %>,
+    currentStreak: <%- analytics.currentStreak %>, 
+    totalWords: <%- analytics.wordStats.totalWords %>,
+    daysActive: <%- analytics.daysActive %>
+};
+
+// Generate full AI insight for all entries
+async function generateFullInsight() {
+    const button = event.target;
+    const insightDiv = document.getElementById('featuredInsight');
+    
+    // Show loading
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Generating...</span>';
+    insightDiv.style.opacity = '0.6';
+    
+    try {
+        // Use server-side prepared data
+        const analyticsData = serverData;
+        const insightText = `User analytics: ${JSON.stringify(analyticsData)}. Recent diary entries for context.`;
+        
+        const response = await fetch('/insights/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                diaryContent: insightText,
+                insightType: 'general'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            insightDiv.innerHTML = `<p>${data.insights}</p>`;
+        } else {
+            insightDiv.innerHTML = '<p style="color: #ef4444;">Failed to generate insight. Please try again.</p>';
+        }
+        
+    } catch (error) {
+        console.error('Error generating insight:', error);
+        insightDiv.innerHTML = '<p style="color: #ef4444;">Network error! Please check your connection.</p>';
+    } finally {
+        button.disabled = false;
+        button.innerHTML = '<i class="fas fa-refresh"></i> <span>Generate New Insight</span>';
+        insightDiv.style.opacity = '1';
+    }
+}
+
+// Add analytics animations on tab switch
+document.addEventListener('DOMContentLoaded', function() {
+    const analyticsCards = document.querySelectorAll('.analytics-card');
+    const insightCards = document.querySelectorAll('.insight-card');
+    
+    // Animate cards when analytics tab is shown
+    function animateAnalytics() {
+        analyticsCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    }
+    
+    // Animate cards when insights tab is shown  
+    function animateInsights() {
+        insightCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateX(-20px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateX(0)';
+            }, index * 150);
+        });
+    }
+    
+    // Listen for tab changes
+    const navTabs = document.querySelectorAll('.nav-tab');
+    navTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const tabType = this.getAttribute('data-tab');
+            
+            setTimeout(() => {
+                if (tabType === 'analytics') {
+                    animateAnalytics();
+                } else if (tabType === 'insights') {
+                    animateInsights();
+                }
+            }, 200);
+        });
+    });
+});
+
+// TTS (Text-to-Speech) Function
+async function generateTTS(entryId) {
+    console.log('🎯 TTS button clicked for entry:', entryId);
+    
+    const button = document.querySelector(`[onclick="generateTTS('${entryId}')"]`);
+    const originalText = button.innerHTML;
+    
+    console.log('Button found:', !!button, 'Disabled:', button?.disabled);
+    
+    try {
+        // Update button to show loading
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Generating...</span>';
+        button.disabled = true;
+        button.classList.add('generating');
+        
+        console.log('🚀 Making TTS request...');
+        
+        // Make request to generate TTS
+        const response = await fetch(`/tts/generate/${entryId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        console.log('📦 TTS Response received:', data);
+        
+        if (data.success) {
+            if (data.useBrowserTTS) {
+                // Use browser's built-in speech synthesis
+                console.log('Using browser TTS for voice synthesis');
+                
+                // Update button
+                button.innerHTML = '<i class="fas fa-volume-up"></i> <span>Speaking...</span>';
+                button.classList.remove('generating');
+                button.classList.add('playing');
+                
+                console.log('Button state after TTS response:', {
+                    disabled: button.disabled,
+                    className: button.className,
+                    innerHTML: button.innerHTML
+                });
+                
+                // Use Web Speech API
+                if ('speechSynthesis' in window) {
+                    // Stop any ongoing speech first
+                    speechSynthesis.cancel();
+                    
+                    const utterance = new SpeechSynthesisUtterance(data.text);
+                    
+                    // Configure voice settings
+                    utterance.lang = data.voice.lang || 'hi-IN';
+                    utterance.pitch = data.voice.pitch || 0.8;
+                    utterance.rate = data.voice.rate || 0.9;
+                    utterance.volume = data.voice.volume || 1.0;
+                    
+                    // Function to set voice and start speaking
+                    const setVoiceAndSpeak = () => {
+                        const voices = speechSynthesis.getVoices();
+                        console.log('🔊 Available voices:', voices.length);
+                        
+                        // Find best Hindi voice
+                        const hindiVoice = voices.find(voice => 
+                            voice.lang.includes('hi') || 
+                            voice.lang.includes('Hindi') ||
+                            voice.name.includes('Hindi') ||
+                            voice.name.includes('हिंदी')
+                        );
+                        
+                        if (hindiVoice) {
+                            utterance.voice = hindiVoice;
+                            console.log('✅ Using Hindi voice:', hindiVoice.name, 'Lang:', hindiVoice.lang);
+                        } else {
+                            console.log('⚠️ Hindi voice not found, using default voice');
+                            console.log('Available voices:', voices.map(v => `${v.name} (${v.lang})`));
+                        }
+                        
+                        // Start speaking
+                        console.log('🎯 Starting speech synthesis...');
+                        speechSynthesis.speak(utterance);
+                        
+                        // Show playing message immediately
+                        showFlashMessage('🎤 Playing Filmy Bollywood voiceover!', 'success');
+                    };
+                    
+                    // Handle speech events
+                    utterance.onstart = () => {
+                        console.log('🎤 Speech started successfully!');
+                        button.innerHTML = '<i class="fas fa-volume-up"></i> <span>Playing...</span>';
+                        button.classList.remove('generating');
+                        button.classList.add('playing');
+                        button.disabled = false;
+                    };
+                    
+                    utterance.onend = () => {
+                        console.log('🎤 Speech ended successfully!');
+                        button.innerHTML = '<i class="fas fa-volume-up"></i> <span>Filmy Voiceover</span>';
+                        button.classList.remove('playing', 'generating');
+                        button.disabled = false;
+                    };
+                    
+                    utterance.onerror = (error) => {
+                        console.error('❌ Speech error:', error);
+                        button.innerHTML = '<i class="fas fa-volume-up"></i> <span>Filmy Voiceover</span>';
+                        button.classList.remove('playing', 'generating');
+                        button.disabled = false;
+                        showFlashMessage('Voice playback failed, trying again...', 'warning');
+                    };
+                    
+                    // Check if voices are loaded, if not wait for them
+                    if (speechSynthesis.getVoices().length > 0) {
+                        setVoiceAndSpeak();
+                    } else {
+                        // Wait for voices to load
+                        speechSynthesis.addEventListener('voiceschanged', setVoiceAndSpeak, { once: true });
+                        // Fallback timeout
+                        setTimeout(setVoiceAndSpeak, 1000);
+                    }
+                    
+                    // IMMEDIATE BUTTON FIX - Re-enable right away!
+                    setTimeout(() => {
+                        button.disabled = false;
+                        button.classList.remove('generating');
+                        console.log('⚡ IMMEDIATE: Button re-enabled after 100ms');
+                    }, 100);
+                    
+                    // Backup timer to reset button completely after 3 seconds
+                    setTimeout(() => {
+                        button.innerHTML = '<i class="fas fa-volume-up"></i> <span>Filmy Voiceover</span>';
+                        button.classList.remove('playing', 'generating');
+                        button.disabled = false;
+                        button.style.pointerEvents = 'auto';
+                        console.log('🔄 BACKUP: Button completely reset after 3 seconds');
+                    }, 3000);
+                    
+                    // Show message in the entry
+                    const entryCard = document.querySelector(`[data-entry-id="${entryId}"]`);
+                    let audioContainer = entryCard.querySelector('.audio-player');
+                    
+                    if (!audioContainer) {
+                        audioContainer = document.createElement('div');
+                        audioContainer.className = 'audio-player';
+                        entryCard.querySelector('.card-content').appendChild(audioContainer);
+                    }
+                    
+                    audioContainer.innerHTML = `
+                        <div class="browser-tts-message">
+                            <i class="fas fa-volume-up"></i>
+                            <strong>Playing Filmy Bollywood Voiceover!</strong>
+                            <br><small>Using browser's speech synthesis with Hindi voice</small>
+                            <button onclick="speechSynthesis.cancel()" class="btn btn-sm btn-outline-secondary mt-2">
+                                <i class="fas fa-stop"></i> Stop
+                            </button>
+                        </div>
+                    `;
+                    audioContainer.classList.add('show');
+                    
+                    // Show success message for browser TTS
+                    if (data.message) {
+                        showFlashMessage(data.message, 'success');
+                    }
+                    
+                    // IMPORTANT: Return here to prevent execution of old audio file logic
+                    return;
+                    
+                } else {
+                    showFlashMessage('Speech synthesis not supported in this browser', 'error');
+                    button.disabled = false; // Re-enable button if speech synthesis not supported
+                    button.classList.remove('generating');
+                    return;
+                }
+                
+            } else {
+                // Original audio file approach
+                // Update button to show play option
+                button.innerHTML = '<i class="fas fa-play"></i> <span>Play Voice</span>';
+                button.classList.remove('generating');
+                button.classList.add('playing');
+            
+            // Create audio element and play
+            const audio = new Audio(data.audioUrl);
+            audio.controls = true;
+            
+            // Add error handling for audio loading
+            audio.addEventListener('error', (e) => {
+                console.error('Audio loading error:', e);
+                showFlashMessage('Audio file could not be played (mock service)', 'warning');
+                
+                // Reset button
+                button.innerHTML = '<i class="fas fa-volume-up"></i> <span>Filmy Voiceover</span>';
+                button.classList.remove('playing');
+                button.disabled = false;
+            });
+            
+            audio.addEventListener('loadstart', () => {
+                console.log('Audio loading started');
+            });
+            
+            audio.addEventListener('canplay', () => {
+                console.log('Audio can start playing');
+            });
+            
+            // Find the entry card and add audio player
+            const entryCard = document.querySelector(`[data-entry-id="${entryId}"]`);
+            let audioContainer = entryCard.querySelector('.audio-player');
+            
+            if (!audioContainer) {
+                audioContainer = document.createElement('div');
+                audioContainer.className = 'audio-player';
+                entryCard.querySelector('.card-content').appendChild(audioContainer);
+            }
+            
+            audioContainer.innerHTML = '';
+            audioContainer.appendChild(audio);
+            audioContainer.classList.add('show');
+            
+            // Try to play audio with error handling
+            audio.play().catch(error => {
+                console.error('Audio play error:', error);
+                showFlashMessage('Mock audio created successfully! (Real Google TTS would have voice)', 'info');
+                
+                // Show a message instead of playing audio
+                audioContainer.innerHTML = `
+                    <div class="mock-audio-message">
+                        <i class="fas fa-info-circle"></i>
+                        Mock TTS: "${data.message}"
+                        <br><small>Real Google TTS would play Hindi voiceover here</small>
+                    </div>
+                `;
+            });
+            
+            // Reset button when audio ends
+            audio.addEventListener('ended', () => {
+                button.innerHTML = '<i class="fas fa-volume-up"></i> <span>Filmy Voiceover</span>';
+                button.classList.remove('playing');
+            });
+            
+            // Show success message
+            if (data.message) {
+                showFlashMessage(data.message, 'success');
+            }
+            
+            } // End of else block for original audio file approach
+            
+        } else {
+            throw new Error(data.error || 'TTS generation failed');
+        }
+        
+    } catch (error) {
+        console.error('TTS Error:', error);
+        button.innerHTML = '<i class="fas fa-exclamation-triangle"></i> <span>Error</span>';
+        button.classList.remove('generating');
+        button.classList.remove('playing');
+        button.disabled = false; // Ensure button is re-enabled on error
+        showFlashMessage('TTS generation failed yaar! Try again.', 'error');
+        
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.disabled = false; // Extra safety
+        }, 2000);
+    }
+}
+
+// Debug function to check button states
+function debugTTSButtons() {
+    const ttsButtons = document.querySelectorAll('[onclick*="generateTTS"]');
+    console.log('TTS Button Debug Info:');
+    ttsButtons.forEach((btn, index) => {
+        console.log(`Button ${index + 1}:`, {
+            disabled: btn.disabled,
+            className: btn.className,
+            innerHTML: btn.innerHTML.substring(0, 50) + '...',
+            onclick: btn.onclick ? btn.onclick.toString().substring(0, 50) + '...' : 'No onclick'
+        });
+    });
+    return ttsButtons;
+}
+
+// Make debug function globally available
+window.debugTTSButtons = debugTTSButtons;
+
+// Emergency button re-enabler function
+function fixTTSButtons() {
+    console.log('🔧 EMERGENCY FIX: Re-enabling all TTS buttons...');
+    const ttsButtons = document.querySelectorAll('[onclick*="generateTTS"]');
+    ttsButtons.forEach((btn, index) => {
+        // Remove disabled attribute completely
+        btn.removeAttribute('disabled');
+        btn.disabled = false;
+        
+        // Reset all classes
+        btn.classList.remove('generating', 'playing');
+        
+        // Reset button content
+        btn.innerHTML = '<i class="fas fa-volume-up"></i> <span>Filmy Voiceover</span>';
+        
+        // Force enable the button
+        btn.style.pointerEvents = 'auto';
+        btn.style.opacity = '1';
+        
+        console.log(`✅ Fixed button ${index + 1}:`, {
+            disabled: btn.disabled,
+            hasDisabledAttribute: btn.hasAttribute('disabled'),
+            className: btn.className
+        });
+    });
+    
+    // Stop any ongoing speech
+    if (window.speechSynthesis) {
+        speechSynthesis.cancel();
+        console.log('🛑 Stopped any ongoing speech synthesis');
+    }
+    
+    console.log(`🎉 All ${ttsButtons.length} TTS buttons have been FORCE re-enabled!`);
+    showFlashMessage('🔧 All TTS buttons have been fixed!', 'success');
+    return ttsButtons.length;
+}
+
+// Make fix function globally available
+window.fixTTSButtons = fixTTSButtons;
+
+// Auto-fix stuck buttons every 5 seconds
+setInterval(() => {
+    const stuckButtons = document.querySelectorAll('[onclick*="generateTTS"][disabled]');
+    if (stuckButtons.length > 0) {
+        console.log(`🔧 AUTO-FIX: Found ${stuckButtons.length} stuck TTS buttons, fixing them...`);
+        stuckButtons.forEach(btn => {
+            btn.removeAttribute('disabled');
+            btn.disabled = false;
+            btn.classList.remove('generating', 'playing');
+            if (btn.innerHTML.includes('Play Voice') || btn.innerHTML.includes('Speaking')) {
+                btn.innerHTML = '<i class="fas fa-volume-up"></i> <span>Filmy Voiceover</span>';
+            }
+        });
+    }
+}, 5000); // Check every 5 seconds
+
+// Force fix buttons when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        console.log('🚀 PAGE LOADED: Ensuring all TTS buttons are enabled...');
+        const allTTSButtons = document.querySelectorAll('[onclick*="generateTTS"]');
+        allTTSButtons.forEach(btn => {
+            btn.disabled = false;
+            btn.removeAttribute('disabled');
+        });
+    }, 1000);
+});
+
+// Helper function to show flash messages
+function showFlashMessage(message, type) {
+    const flashContainer = document.createElement('div');
+    flashContainer.className = `flash-message ${type}`;
+    flashContainer.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? 'var(--accent-green)' : 'var(--accent-red)'};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: var(--border-radius);
+        z-index: 10000;
+        animation: slideInRight 0.3s ease;
+    `;
+    flashContainer.textContent = message;
+    
+    document.body.appendChild(flashContainer);
+    
+    setTimeout(() => {
+        flashContainer.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => flashContainer.remove(), 300);
+    }, 3000);
+}
+
+console.log('🏠 Enhanced home page with analytics loaded!');
+console.log('🎤 TTS functionality ready!');
+
+// INLINE FIXED TTS FUNCTION - No external file needed
+window.generateTTS = async function(entryId) {
+    console.log('🎯 FIXED TTS CALLED - Entry ID:', entryId);
+    
+    // Find button with multiple fallbacks
+    let button = document.querySelector(`[onclick="generateTTS('${entryId}')"]`);
+    if (!button) {
+        button = document.querySelector(`.listen-btn`);
+    }
+    
+    if (!button) {
+        console.error('❌ Button not found');
+        alert('Button not found! Refreshing page...');
+        location.reload();
+        return;
+    }
+    
+    const originalText = button.innerHTML;
+    
+    // FORCE button to be completely functional
+    button.disabled = false;
+    button.removeAttribute('disabled');
+    button.style.pointerEvents = 'auto';
+    button.style.cursor = 'pointer';
+    button.classList.remove('generating', 'playing');
+    
+    try {
+        // Show loading
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+        button.classList.add('generating');
+        
+        // Simple fetch request
+        const response = await fetch(`/tts/generate/${entryId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const data = await response.json();
+        console.log('📦 Response:', data);
+        
+        if (!data.success) {
+            throw new Error(data.error || 'Failed to generate TTS');
+        }
+        
+        // IMMEDIATELY re-enable button
+        button.disabled = false;
+        button.classList.remove('generating');
+        
+        if (data.useBrowserTTS && window.speechSynthesis) {
+            // Update button
+            button.innerHTML = '<i class="fas fa-volume-up"></i> Speaking...';
+            button.classList.add('playing');
+            
+            // Stop any existing speech
+            speechSynthesis.cancel();
+            
+            // Create speech
+            const utterance = new SpeechSynthesisUtterance(data.text);
+            utterance.lang = 'hi-IN';
+            utterance.pitch = 0.7;
+            utterance.rate = 0.8;
+            utterance.volume = 1.0;
+            
+            // Event handlers
+            utterance.onstart = () => {
+                button.innerHTML = '<i class="fas fa-volume-up"></i> Playing...';
+                alert('🎬 Filmy voiceover शुरू! सुनिए dramatic style में!');
+            };
+            
+            utterance.onend = () => {
+                button.innerHTML = '<i class="fas fa-volume-up"></i> Filmy Voiceover';
+                button.classList.remove('playing');
+                button.disabled = false;
+            };
+            
+            utterance.onerror = () => {
+                button.innerHTML = '<i class="fas fa-volume-up"></i> Try Again';
+                button.classList.remove('playing');
+                button.disabled = false;
+                alert('❌ Voice error! Click to try again.');
+            };
+            
+            // Start speaking
+            speechSynthesis.speak(utterance);
+        } else {
+            alert('🎵 TTS Generated! ' + (data.message || ''));
+            button.innerHTML = originalText;
+        }
+        
+    } catch (error) {
+        console.error('❌ Error:', error);
+        button.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+        button.classList.remove('generating', 'playing');
+        button.disabled = false;
+        alert('❌ Error: ' + error.message);
+        
+        setTimeout(() => {
+            button.innerHTML = originalText;
+        }, 3000);
+    }
+};
+
+// Emergency fix function
+window.fixAllTTSButtons = function() {
+    const buttons = document.querySelectorAll('[onclick*="generateTTS"], .listen-btn');
+    buttons.forEach(btn => {
+        btn.disabled = false;
+        btn.removeAttribute('disabled');
+        btn.style.pointerEvents = 'auto';
+        btn.style.cursor = 'pointer';
+        btn.classList.remove('generating', 'playing');
+    });
+    alert(`🎉 Fixed ${buttons.length} TTS buttons!`);
+};
+
+// Auto-fix on load
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(window.fixAllTTSButtons, 1000);
+});
+</script>
 
 <script src="/js/home-new.js"></script>

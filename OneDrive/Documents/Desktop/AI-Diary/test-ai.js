@@ -1,48 +1,50 @@
-// Test AI functionality
-// Run this file to test OpenAI integration
+// Test AI functionality - CONVERTED TO GEMINI API
+// Run this file to test Gemini integration
 
 require('dotenv').config();
-const OpenAI = require('openai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
+// Initialize Gemini with API key from environment
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 async function testAI() {
     try {
-        console.log('🚀 Testing OpenAI API...');
+        console.log('🚀 Testing Gemini API...');
         
-        const completion = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
-            messages: [
-                {
-                    role: "system",
-                    content: "You are a desi AI friend. Respond in Hinglish with 'yaar' and be supportive."
-                },
-                {
-                    role: "user",
-                    content: "Test kar raha hun API, kya haal hai?"
-                }
-            ],
-            max_tokens: 100
-        });
+        // Check if API key exists
+        if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'your_gemini_api_key_here') {
+            console.log('❌ API key missing! Please add GEMINI_API_KEY to .env file');
+            return;
+        }
+        
+        const prompt = `You are a desi AI friend who speaks Hinglish. Respond with 'yaar' and be supportive. 
+        User says: "Test kar raha hun API, kya haal hai?"
+        Give a short, friendly response in Hinglish.`;
+        
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
 
         console.log('✅ Success! AI Response:');
-        console.log(completion.choices[0].message.content);
-        console.log('\n💰 Tokens used:', completion.usage?.total_tokens || 'Unknown');
+        console.log(text);
+        console.log('\n🎯 API Status: Working perfectly!');
         
     } catch (error) {
         console.error('❌ Error:', error.message);
         
-        if (error.status === 401) {
-            console.log('🔑 API key problem - check .env file');
-        } else if (error.status === 429) {
-            console.log('⏰ Rate limit - wait and try again');
-        } else if (error.status === 403) {
-            console.log('💳 Billing issue - check OpenAI dashboard');
+        if (error.message?.includes('API_KEY_INVALID')) {
+            console.log('🔑 Invalid API key - check your Gemini credentials');
+        } else if (error.message?.includes('RATE_LIMIT_EXCEEDED')) {
+            console.log('⏰ Rate limit exceeded - wait and try again');
+        } else if (error.message?.includes('QUOTA_EXCEEDED')) {
+            console.log('💳 Quota exhausted - check Gemini billing');
+        } else {
+            console.log('🔧 General error - check network and API key');
         }
     }
 }
 
 // Run test
+console.log('🧪 Starting Gemini AI Test...');
 testAI();
