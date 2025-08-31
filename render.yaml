@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: ai-diary
+    env: node
+    plan: free
+    buildCommand: cd OneDrive && npm install
+    startCommand: node OneDrive/app.js
+    envVars:
+      - key: NODE_ENV
+        value: production
