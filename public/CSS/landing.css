@@ -277,9 +277,8 @@ body {
 }
 
 .hero-text p {
-    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
-    color: var(--text-secondary);
-    line-height: 1.7;
+    font-size: clamp(0.2rem, 2vw, 1rem);
+    line-height: 1.2;
     margin-bottom: var(--gap-xl);
     max-width: 90%;
 }
