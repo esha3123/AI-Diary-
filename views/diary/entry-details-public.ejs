@@ -125,6 +125,13 @@
                 <span class="btn-text">Comment</span>
             </button>
             
+            <button class="action-btn tts-btn" onclick="generateTTS('<%= entry._id %>')">
+                <div class="btn-icon">
+                    <i class="fas fa-volume-up"></i>
+                </div>
+                <span class="btn-text">Listen</span>
+            </button>
+            
             <button class="action-btn share-btn">
                 <div class="btn-icon">
                     <i class="far fa-share-square"></i>
@@ -138,6 +145,69 @@
                 </div>
                 <span class="btn-text">Save</span>
             </button>
+        </div>
+    </div>
+
+    <!-- AI Insights Section -->
+    <div class="ai-insights-section-public">
+        <div class="insight-card ai-motivation">
+            <div class="card-header"> 
+                <h3>
+                    <i class="fas fa-brain"></i>
+                    AI Insights
+                </h3>
+                <div class="insight-controls">
+                    <select id="insightType" class="insight-type-select">
+                        <option value="general">General Analysis</option>
+                        <option value="mood">Mood Analysis</option>
+                        <option value="growth">Growth Focus</option>
+                        <option value="reflection">Deep Reflection</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-content">
+                <!-- Control Buttons -->
+                <div class="ai-controls">
+                    <button class="action-btn ai-btn" onclick="generateAIInsights()" id="generateBtn">
+                        <i class="fas fa-magic"></i>
+                        Generate Insights
+                    </button>
+                    <button class="action-btn voice-btn" onclick="speakInsights()" id="voiceBtn" disabled>
+                        <i class="fas fa-volume-up"></i>
+                        Listen
+                    </button>
+                </div>
+
+                <!-- Loading State -->
+                <div class="ai-loading" id="aiLoading" style="display: none;">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <p class="loading-text">AI is analyzing this entry...</p>
+                </div>
+
+                <!-- AI Insights Content -->
+                <div class="ai-insights-content" id="aiInsightsContent">
+                    <div class="default-message">
+                        <div class="ai-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            <h4>AI-Powered Story Analysis</h4>
+                            <p>Click the button above to get personalized insights about this public story.</p>
+                            <p><em>Get thoughtful analysis, emotional understanding, and growth suggestions.</em></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Display -->
+                <div class="ai-error" id="aiError" style="display: none;">
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span id="errorText">Something went wrong!</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -420,3 +490,267 @@ function deleteComment(entryId, commentId) {
     }
 }
 </script>
+
+<!-- AI Insights JavaScript -->
+<script>
+let currentInsights = '';
+
+async function generateAIInsights() {
+    const diaryContent = `<%= entry.content.replace(/"/g, '\\"').replace(/\n/g, '\\n') %>`;
+    const insightType = document.getElementById('insightType').value;
+    
+    // UI Elements
+    const loadingElement = document.getElementById('aiLoading');
+    const contentElement = document.getElementById('aiInsightsContent');
+    const errorElement = document.getElementById('aiError');
+    const generateBtn = document.getElementById('generateBtn');
+    const voiceBtn = document.getElementById('voiceBtn');
+    
+    // Show loading state
+    loadingElement.style.display = 'block';
+    contentElement.style.display = 'none';
+    errorElement.style.display = 'none';
+    generateBtn.disabled = true;
+    generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+    
+    try {
+        const response = await fetch('/insights/generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                diaryContent: diaryContent,
+                insightType: insightType 
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            currentInsights = data.insights;
+            
+            // Display insights with Bollywood style
+            contentElement.innerHTML = `
+                <div class="ai-insights-result">
+                    <div class="ai-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="insight-header">
+                            <h4>
+                                <i class="fas fa-star"></i> 
+                                ${getInsightTitle(insightType)}
+                            </h4>
+                            <span class="insight-badge">${getInsightBadge(insightType)}</span>
+                        </div>
+                        <div class="insight-text">
+                            <p>${data.insights}</p>
+                        </div>
+                        <div class="insight-footer">
+                            <small class="text-muted">
+                                <i class="fas fa-magic"></i> Generated by AI
+                                <span class="insight-type-label">• ${insightType.charAt(0).toUpperCase() + insightType.slice(1)}</span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            contentElement.style.display = 'block';
+            voiceBtn.disabled = false;
+            
+        } else {
+            // Show error
+            errorElement.querySelector('#errorText').textContent = data.error;
+            errorElement.style.display = 'block';
+        }
+        
+    } catch (error) {
+        console.error('Network Error:', error);
+        errorElement.querySelector('#errorText').textContent = 'Network error! Please check your internet connection.';
+        errorElement.style.display = 'block';
+    } finally {
+        // Hide loading
+        loadingElement.style.display = 'none';
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Regenerate';
+    }
+}
+
+// Helper functions for UI
+function getInsightTitle(type) {
+    switch(type) {
+        case 'mood': return 'Mood Analysis';
+        case 'growth': return 'Growth Insights';
+        case 'reflection': return 'Deep Reflection';
+        default: return 'AI Analysis';
+    }
+}
+
+function getInsightBadge(type) {
+    switch(type) {
+        case 'mood': return '💝 Emotions';
+        case 'growth': return '🚀 Growth';
+        case 'reflection': return '🤔 Thoughts';
+        default: return '🎭 General';
+    }
+}
+
+// Text-to-Speech function for insights
+function speakInsights() {
+    if (!currentInsights) {
+        alert('Please generate insights first!');
+        return;
+    }
+    
+    const voiceBtn = document.getElementById('voiceBtn');
+    
+    if ('speechSynthesis' in window) {
+        // Stop any ongoing speech
+        speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(currentInsights);
+        
+        // Try to find Hindi/Indian voice
+        const voices = speechSynthesis.getVoices();
+        const indianVoice = voices.find(voice => 
+            voice.lang.includes('hi') || 
+            voice.lang.includes('en-IN') ||
+            voice.name.toLowerCase().includes('hindi') ||
+            voice.name.toLowerCase().includes('indian')
+        );
+        
+        if (indianVoice) {
+            utterance.voice = indianVoice;
+        }
+        
+        // Set speech properties
+        utterance.rate = 0.9;    // Slightly slower for clarity
+        utterance.pitch = 1.1;   // Slightly higher pitch
+        utterance.volume = 1;    // Full volume
+        
+        // Event handlers
+        utterance.onstart = () => {
+            voiceBtn.innerHTML = '<i class="fas fa-stop voice-animation"></i> Stop';
+            voiceBtn.classList.add('speaking');
+            voiceBtn.onclick = () => {
+                speechSynthesis.cancel();
+            };
+        };
+        
+        utterance.onend = () => {
+            voiceBtn.innerHTML = '<i class="fas fa-volume-up"></i> Listen';
+            voiceBtn.classList.remove('speaking');
+            voiceBtn.onclick = speakInsights;
+        };
+        
+        utterance.onerror = () => {
+            voiceBtn.innerHTML = '<i class="fas fa-volume-up"></i> Listen';
+            voiceBtn.classList.remove('speaking');
+            voiceBtn.onclick = speakInsights;
+            alert('Voice playback error!');
+        };
+        
+        speechSynthesis.speak(utterance);
+        
+    } else {
+        alert('Your browser does not support voice features! Please try Chrome or Firefox.');
+    }
+}
+
+// Load voices when page loads
+window.addEventListener('load', () => {
+    if ('speechSynthesis' in window) {
+        // Load voices
+        speechSynthesis.getVoices();
+        
+        // Some browsers need this event
+        speechSynthesis.onvoiceschanged = () => {
+            speechSynthesis.getVoices();
+        };
+    }
+});
+
+// TTS Function for diary entry
+window.generateTTS = async function(entryId) {
+    console.log('🎯 Public Entry TTS called for:', entryId);
+    
+    const button = document.querySelector('.tts-btn');
+    if (!button) {
+        alert('TTS button not found!');
+        return;
+    }
+    
+    const originalText = button.innerHTML;
+    
+    // Force button to work
+    button.disabled = false;
+    button.removeAttribute('disabled');
+    button.style.pointerEvents = 'auto';
+    
+    try {
+        button.innerHTML = '<div class="btn-icon"><i class="fas fa-spinner fa-spin"></i></div><span class="btn-text">Loading...</span>';
+        button.classList.add('generating');
+        
+        const response = await fetch(`/tts/generate/${entryId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.error || 'TTS failed');
+        }
+        
+        button.disabled = false;
+        button.classList.remove('generating');
+        
+        if (data.useBrowserTTS && window.speechSynthesis) {
+            button.innerHTML = '<div class="btn-icon"><i class="fas fa-volume-up"></i></div><span class="btn-text">Speaking...</span>';
+            button.classList.add('playing');
+            
+            speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(data.text);
+            utterance.lang = 'hi-IN';
+            utterance.pitch = 0.7;
+            utterance.rate = 0.8;
+            
+            utterance.onstart = () => {
+                showToast('🎬 Filmy voiceover शुरू!', 'success');
+            };
+            
+            utterance.onend = () => {
+                button.innerHTML = '<div class="btn-icon"><i class="fas fa-volume-up"></i></div><span class="btn-text">Listen</span>';
+                button.classList.remove('playing');
+                button.disabled = false;
+            };
+            
+            utterance.onerror = () => {
+                button.innerHTML = '<div class="btn-icon"><i class="fas fa-volume-up"></i></div><span class="btn-text">Try Again</span>';
+                button.classList.remove('playing');
+                button.disabled = false;
+            };
+            
+            speechSynthesis.speak(utterance);
+        } else {
+            showToast('🎵 TTS Generated! ' + (data.message || ''), 'success');
+            button.innerHTML = originalText;
+        }
+        
+    } catch (error) {
+        button.innerHTML = '<div class="btn-icon"><i class="fas fa-exclamation-triangle"></i></div><span class="btn-text">Error</span>';
+        button.classList.remove('generating', 'playing');
+        button.disabled = false;
+        showToast('❌ Error: ' + error.message, 'error');
+        
+        setTimeout(() => {
+            button.innerHTML = originalText;
+        }, 3000);
+    }
+};
+</script>
+
+<script src="/js/tts-fixed.js"></script>

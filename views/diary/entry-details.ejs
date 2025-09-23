@@ -94,7 +94,7 @@
                         <i class="fas fa-brain"></i>
                         Mood Analysis
                     </h3>
-                </div>
+              
                 <div class="card-content">
                     <div class="mood-score">
                         <div class="mood-circle">
@@ -121,7 +121,7 @@
                                 <div class="bar-fill" style="width: 80%"></div>
                             </div>
                         </div>
-                    </div>
+                    </div> </div>
                 </div>
             </div>
 
@@ -132,7 +132,7 @@
                         <i class="fas fa-link"></i>
                         Similar Entries
                     </h3>
-                </div>
+               
                 <div class="card-content">
                     <div class="related-entry">
                         <div class="related-mood">😄</div>
@@ -155,46 +155,13 @@
                             <span class="related-date">February 28, 2024</span>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Related Entries Card - Duplicate for bottom right position -->
-        <div class="insight-card related-entries bottom-related-card">
-            <div class="card-header">
-                <h3>
-                    <i class="fas fa-link"></i>
-                    Similar Entries
-                </h3>
-            </div>
-            <div class="card-content">
-                <div class="related-entry">
-                    <div class="related-mood">😄</div>
-                    <div class="related-info">
-                        <h4>Weekend Adventure</h4>
-                        <span class="related-date">March 8, 2024</span>
-                    </div>
-                </div>
-                <div class="related-entry">
-                    <div class="related-mood">🌅</div>
-                    <div class="related-info">
-                        <h4>Morning Gratitude</h4>
-                        <span class="related-date">March 10, 2024</span>
-                    </div>
-                </div>
-                <div class="related-entry">
-                    <div class="related-mood">🎉</div>
-                    <div class="related-info">
-                        <h4>Celebration Day</h4>
-                        <span class="related-date">February 28, 2024</span>
-                    </div>
-                </div>
+                </div> </div>
             </div>
         </div>
 
         <!-- AI Motivation Card - moved below content -->
         <div class="insight-card ai-motivation">
-            <div class="card-header"> 
+            <div class="card-header">
                 <h3>
                     <i class="fas fa-brain"></i>
                     AI Insights
@@ -207,19 +174,19 @@
                         <option value="reflection">Deep Reflection</option>
                     </select>
                 </div>
-            </div>
+            
             <div class="card-content">
                 <!-- Control Buttons -->
                 <div class="ai-controls">
-                    <button class="action-btn ai-btn" onclick="generateAIInsights()" id="generateBtn">
-                        <i class="fas fa-magic"></i>
-                        Generate Insights
-                    </button>
-                    <button class="action-btn voice-btn" onclick="speakInsights()" id="voiceBtn" disabled>
-                        <i class="fas fa-volume-up"></i>
-                        Listen
-                    </button>
-                </div>
+                <button class="action-btn ai-btn" onclick="generateAIInsights()" id="generateBtn">
+                    <i class="fas fa-magic"></i>
+                    Generate Insights
+                </button>
+                <button class="action-btn voice-btn" onclick="speakInsights()" id="voiceBtn" disabled>
+                    <i class="fas fa-volume-up"></i>
+                    Listen
+                </button>
+            </div>
 
                 <!-- Loading State -->
                 <div class="ai-loading" id="aiLoading" style="display: none;">
@@ -250,7 +217,7 @@
                         <span id="errorText">Something went wrong!</span>
                     </div>
                 </div>
-            </div>
+            </div></div>
         </div>
     </div>
 </div>
@@ -294,7 +261,7 @@ async function generateAIInsights() {
         if (data.success) {
             currentInsights = data.insights;
             
-            // Display insights with Bollywood style
+            // Display insights with proper nested structure
             contentElement.innerHTML = `
                 <div class="ai-insights-result">
                     <div class="ai-avatar">
