@@ -30,7 +30,7 @@ let dburl = process.env.MONGO_DB_ATLAS ;
 
 main().then((res)=>{
     console.log("connected to database: Dear-diary");
-    console.log("Database connection state:", mongoose.connection.readyState);
+    // console.log("Database connection state:", mongoose.connection.readyState);
 
     // Initialize the database with a test entry if it's empty
     entries.countDocuments().then((count) => {

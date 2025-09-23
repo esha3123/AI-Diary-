@@ -1,4 +1,5 @@
 const entries = require("../models/schema.js");
+const ExpressError = require("../utils/ExpressError.js");
 
 module.exports.home = async (req, res) => {
     try {
@@ -147,14 +148,31 @@ module.exports.publicRoute=async (req,res)=>{
 module.exports.pubprvtroute=async (req,res)=>{
    try {
        let {id} = req.params;
-       const publicEntry = await entries.findOne({ _id: id, isPrivate: false }).populate('comments');
-       if (!publicEntry) {
-           throw new ExpressError(404, "Public entry not found");
+       console.log("Looking for public entry with ID:", id); // Debug log
+       
+       // Validate the ID format
+       if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+           console.log("Invalid MongoDB ObjectId format:", id);
+           req.flash("error", "Invalid entry ID");
+           return res.redirect("/AI-diary/public");
        }
+       
+       const publicEntry = await entries.findOne({ _id: id, isPrivate: false })
+           .populate('comments')
+           .populate('owner');
+           
+       if (!publicEntry) {
+           console.log("Public entry not found for ID:", id); // Debug log
+           req.flash("error", "Public entry not found or has been made private");
+           return res.redirect("/AI-diary/public");
+       }
+       
+       console.log("Successfully found public entry:", publicEntry.title); // Debug log
        res.render("diary/entry-details-public.ejs", { entry: publicEntry, req: req });
    } catch (error) {
        console.error("Error fetching public entry details:", error);
-       throw new ExpressError(404, "Entry not found");
+       req.flash("error", "Entry not found");
+       res.redirect("/AI-diary/public");
    }
 }
 module.exports.analytics = async (req, res) => {

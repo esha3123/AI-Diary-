@@ -31,7 +31,7 @@ router
     .get( wrapAsync(controllerentries.publicRoute))
 
 router  
-    .route("/public/id")
+    .route("/public/:id")
     .get( wrapAsync(controllerentries.pubprvtroute))
 
 router
