@@ -15,10 +15,10 @@ const entriesRoutes = require("./routes/entries.js")
 const commentRoutes = require("./routes/comment.js")
 const insightsRoutes = require("./routes/insights.js") // AI insights route
 const ttsRoutes = require("./routes/tts.js") // TTS routes
+const authRoutes = require("./routes/auth.js") // Social auth routes
 const session = require("express-session"); // ADD THIS!
 const flash = require("connect-flash");
-const passport = require("passport");
-const LocalStrategy=require("passport-local");
+const passport = require("./config/auth.js"); // Updated to use auth config
 const userRoutes=require("./routes/user.js");
 const User = require("./models/user.js");
 
@@ -87,9 +87,7 @@ app.use(flash());
 //---------passport configuration--------------------------
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+// Note: Passport strategies are now configured in config/auth.js
 
 //---------flash middleware--------------------------
 app.use((req, res, next) => {
@@ -104,6 +102,9 @@ app.use((req, res, next) => {
 app.get("/", wrapAsync(async (req,res,next)=>{
     res.render("diary/landing.ejs") 
 }));
+
+// Social Authentication routes
+app.use("/auth", authRoutes);
 
 // User routes MUST come FIRST to avoid being caught by /:id route
 app.use("/AI-diary", userRoutes);

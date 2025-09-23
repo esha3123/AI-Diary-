@@ -4,6 +4,7 @@ const router = express.Router();
 const User = require("../models/user.js")
 const passport =require("passport")
 const {saveredirectUrl}=require("../utils/middleware.js")
+const { sendWelcomeEmail, sendVerificationEmail, generateEmailToken } = require("../utils/emailService.js");
 
 // Custom authentication middleware for better error messages
 const customAuthenticate = (req, res, next) => {
@@ -71,8 +72,22 @@ router.post("/register",wrapAsync(async(req,res)=>{
         return res.redirect("/AI-diary/register");
     }
     
-    const newUser = new User({username,email});
+    const newUser = new User({
+        username,
+        email,
+        name: username, // Set name to username initially
+        authMethod: 'local'
+    });
     let registeredUser = await User.register(newUser,password);
+    
+    // Send welcome email
+    try {
+        await sendWelcomeEmail(registeredUser);
+        console.log(`Welcome email sent to ${registeredUser.email}`);
+    } catch (emailError) {
+        console.error('Failed to send welcome email:', emailError);
+        // Don't fail registration if email sending fails
+    }
     
     // Auto-login after successful registration
     req.login(registeredUser, (err) => {
@@ -80,7 +95,7 @@ router.post("/register",wrapAsync(async(req,res)=>{
             req.flash("error", "Registration successful but auto-login failed. Please login manually.");
             return res.redirect("/AI-diary/login");
         }
-        req.flash("success","Welcome to AI Diary! Registration successful.");
+        req.flash("success","Welcome to AI Diary! Registration successful. Check your email for a welcome message!");
         res.redirect("/AI-diary");
     });
     
