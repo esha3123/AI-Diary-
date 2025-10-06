@@ -4,7 +4,32 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 // Initialize Gemini with API key from environment
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+// Multiple model fallbacks in case one is overloaded
+const getAvailableModel = async () => {
+    const modelOptions = [
+        'gemini-2.5-flash',
+        'gemini-pro-latest',
+        'gemini-flash-latest',
+        'gemini-2.0-flash'
+    ];
+    
+    for (const modelName of modelOptions) {
+        try {
+            const model = genAI.getGenerativeModel({ model: modelName });
+            // Test with a simple prompt
+            await model.generateContent("test");
+            console.log(`✅ Using model: ${modelName}`);
+            return model;
+        } catch (error) {
+            console.log(`❌ Model ${modelName} unavailable:`, error.message.split('\n')[0]);
+            continue;
+        }
+    }
+    
+    // If all models fail, return the default and let it fail gracefully
+    return genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+};
 
 // Generate AI insights for diary entry
 router.post('/generate', async (req, res) => {
@@ -19,8 +44,11 @@ router.post('/generate', async (req, res) => {
             });
         }
 
-        // Check if API key exists
-        if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'your_gemini_api_key_here') {
+        // Check if API key exists and is valid
+        if (!process.env.GEMINI_API_KEY || 
+            process.env.GEMINI_API_KEY === 'your_gemini_api_key_here' || 
+            process.env.GEMINI_API_KEY === 'paste_your_actual_gemini_api_key_here' ||
+            process.env.GEMINI_API_KEY.length < 30) {
             return res.json({ 
                 success: false, 
                 error: 'Gemini API key not configured. Please check your .env file!' 
@@ -62,46 +90,81 @@ router.post('/generate', async (req, res) => {
                 userPrompt = `Iss diary entry ke baare mein kuch achha insights do yaar, filmy style mein: "${diaryContent}"`;
         }
 
-        // Call Gemini API
+        // Call Gemini API with fallback model support
         const prompt = `${systemPrompt}\n\n${userPrompt}`;
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const insights = response.text();
         
-        // Log usage for monitoring (optional)
-        console.log(`AI Insight generated - Type: ${insightType}, Characters used: ~${diaryContent.length + insights.length}`);
+        let insights;
+        let modelUsed;
+        
+        try {
+            // Try with the default model first
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            insights = response.text();
+            modelUsed = "gemini-2.5-flash";
+        } catch (primaryError) {
+            console.log('Primary model failed, trying fallbacks...');
+            
+            // If primary model fails, try fallbacks
+            const fallbackModels = ['gemini-pro-latest', 'gemini-flash-latest', 'gemini-2.0-flash'];
+            
+            for (const modelName of fallbackModels) {
+                try {
+                    const fallbackModel = genAI.getGenerativeModel({ model: modelName });
+                    const result = await fallbackModel.generateContent(prompt);
+                    const response = await result.response;
+                    insights = response.text();
+                    modelUsed = modelName;
+                    console.log(`✅ Success with fallback model: ${modelName}`);
+                    break;
+                } catch (fallbackError) {
+                    console.log(`❌ Fallback model ${modelName} failed:`, fallbackError.message.split('\n')[0]);
+                    continue;
+                }
+            }
+            
+            // If all models fail, throw the original error
+            if (!insights) {
+                throw primaryError;
+            }
+        }
+        
+        // Log usage for monitoring
+        console.log(`AI Insight generated - Model: ${modelUsed}, Type: ${insightType}, Characters: ~${diaryContent.length + insights.length}`);
         
         res.json({ 
             success: true, 
             insights: insights,
-            type: insightType 
+            type: insightType,
+            model: modelUsed
         });
 
     } catch (error) {
         console.error('Gemini API Error:', error);
         
-        // Handle different types of errors
+        // Handle different types of errors with user-friendly messages
+        let errorMessage = 'Something went wrong. Please try again!';
+        
         if (error.message?.includes('API_KEY_INVALID')) {
-            res.json({ 
-                success: false, 
-                error: 'Invalid API key. Please check your Gemini credentials!' 
-            });
+            errorMessage = 'Invalid API key. Please check your Gemini credentials!';
         } else if (error.message?.includes('RATE_LIMIT_EXCEEDED')) {
-            res.json({ 
-                success: false, 
-                error: 'Rate limit exceeded. Please wait a moment and try again!' 
-            });
+            errorMessage = 'Too many requests! Please wait a moment and try again.';
         } else if (error.message?.includes('QUOTA_EXCEEDED')) {
-            res.json({ 
-                success: false, 
-                error: 'Quota exhausted. Please check your Gemini billing!' 
-            });
-        } else {
-            res.json({ 
-                success: false, 
-                error: 'Something went wrong. Please try again!' 
-            });
+            errorMessage = 'API quota exhausted. Please check your Gemini billing!';
+        } else if (error.message?.includes('overloaded') || error.status === 503) {
+            errorMessage = 'AI service is busy right now. Please try again in a few seconds!';
+        } else if (error.message?.includes('404') || error.message?.includes('not found')) {
+            errorMessage = 'AI model temporarily unavailable. Please try again later!';
+        } else if (error.message?.includes('timeout')) {
+            errorMessage = 'Request timed out. Please try again!';
         }
+        
+        res.json({ 
+            success: false, 
+            error: errorMessage,
+            technical: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 });
 
@@ -115,16 +178,41 @@ router.get('/test', async (req, res) => {
             });
         }
 
-        // Simple test call
-        const result = await model.generateContent("Say 'Hello yaar!' in Hinglish");
-        const response = await result.response;
-        const text = response.text();
+        // Test multiple models to see which ones work
+        const modelOptions = [
+            'gemini-2.5-flash',
+            'gemini-pro-latest',
+            'gemini-flash-latest',
+            'gemini-2.0-flash'
+        ];
+        
+        const results = {};
+        
+        for (const modelName of modelOptions) {
+            try {
+                const model = genAI.getGenerativeModel({ model: modelName });
+                const result = await model.generateContent("Say 'Hello yaar!' in Hinglish");
+                const response = await result.response;
+                const text = response.text();
+                
+                results[modelName] = {
+                    status: 'working',
+                    response: text
+                };
+            } catch (error) {
+                results[modelName] = {
+                    status: 'failed',
+                    error: error.message.split('\n')[0]
+                };
+            }
+        }
 
         res.json({ 
-            status: 'success', 
-            message: 'Gemini working perfectly!',
-            response: text 
+            status: 'test_complete',
+            message: 'Model availability check completed',
+            models: results
         });
+        
     } catch (error) {
         res.json({ 
             status: 'error', 

@@ -4,10 +4,6 @@
 require('dotenv').config();
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// Initialize Gemini with API key from environment
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
 async function testAI() {
     try {
         console.log('🚀 Testing Gemini API...');
@@ -18,30 +14,49 @@ async function testAI() {
             return;
         }
         
-        const prompt = `You are a desi AI friend who speaks Hinglish. Respond with 'yaar' and be supportive. 
-        User says: "Test kar raha hun API, kya haal hai?"
-        Give a short, friendly response in Hinglish.`;
+        console.log('🔑 API Key found, length:', process.env.GEMINI_API_KEY.length);
         
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
+        // Initialize Gemini with API key
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        
+        // Try the working model names from API
+        const modelsToTry = [
+            'gemini-2.5-flash',
+            'gemini-pro-latest', 
+            'gemini-flash-latest',
+            'gemini-2.0-flash',
+            'gemini-2.5-pro'
+        ];
+        
+        for (const modelName of modelsToTry) {
+            try {
+                console.log(`\n🧪 Trying model: ${modelName}`);
+                const model = genAI.getGenerativeModel({ model: modelName });
+                
+                const prompt = "Say hello in a friendly way.";
+                const result = await model.generateContent(prompt);
+                const response = await result.response;
+                const text = response.text();
 
-        console.log('✅ Success! AI Response:');
-        console.log(text);
-        console.log('\n🎯 API Status: Working perfectly!');
+                console.log(`✅ SUCCESS with ${modelName}!`);
+                console.log('📝 Response:', text);
+                console.log('\n🎯 Use this model in your app!');
+                return modelName; // Return successful model name
+                
+            } catch (error) {
+                console.log(`❌ ${modelName} failed:`, error.message.split('\n')[0]);
+            }
+        }
+        
+        console.log('\n❌ All models failed. Check your API key validity.');
         
     } catch (error) {
         console.error('❌ Error:', error.message);
-        
-        if (error.message?.includes('API_KEY_INVALID')) {
-            console.log('🔑 Invalid API key - check your Gemini credentials');
-        } else if (error.message?.includes('RATE_LIMIT_EXCEEDED')) {
-            console.log('⏰ Rate limit exceeded - wait and try again');
-        } else if (error.message?.includes('QUOTA_EXCEEDED')) {
-            console.log('💳 Quota exhausted - check Gemini billing');
-        } else {
-            console.log('🔧 General error - check network and API key');
-        }
+        console.log('\n🔧 Troubleshooting:');
+        console.log('1. Check if your API key is correct');
+        console.log('2. Make sure you have enabled the Gemini API');
+        console.log('3. Check if you have billing enabled');
+        console.log('4. Visit: https://makersuite.google.com/app/apikey');
     }
 }
 
